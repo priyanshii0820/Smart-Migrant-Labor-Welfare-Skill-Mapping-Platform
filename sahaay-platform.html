@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sahaay — Smart Migrant Labor Welfare & Skill Mapping Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1e3a5f;--primary-light:#2d5a9e;--primary-bg:#eef2f8;
+  --teal:#0d9488;--teal-light:#ccfbf1;
+  --amber:#d97706;--amber-light:#fef3c7;
+  --red:#dc2626;--red-light:#fee2e2;
+  --blue:#3b82f6;--blue-light:#dbeafe;
+  --bg:#f8fafc;--card:#ffffff;
+  --border:#e2e8f0;--text:#1e293b;--muted:#64748b;--light:#f1f5f9;
+  --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+a{color:var(--primary);text-decoration:none}
+button{cursor:pointer;font-family:inherit;font-size:14px}
+input,select,textarea{font-family:inherit;font-size:14px}
+
+/* LAYOUT */
+#app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--primary);color:#fff;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.topbar-brand span{color:#7dd3fc}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.role-select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 10px;border-radius:8px;font-size:13px}
+.role-select option{background:var(--primary);color:#fff}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;border:2px solid rgba(255,255,255,.3)}
+
+/* SIDEBAR */
+.main-layout{display:flex;flex:1}
+.sidebar{width:220px;background:var(--card);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--muted);font-size:14px;transition:.15s}
+.sidebar-nav a:hover{background:var(--light);color:var(--text)}
+.sidebar-nav a.active{background:var(--primary-bg);color:var(--primary);font-weight:600;border-right:3px solid var(--primary)}
+.sidebar-nav .nav-icon{font-size:17px;width:22px;text-align:center}
+.sidebar-section{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;padding:12px 20px 4px}
+.content-area{flex:1;padding:24px;overflow-x:hidden}
+.top-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:4px;overflow-x:auto}
+.top-nav a{padding:14px 16px;font-size:14px;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+.top-nav a:hover{color:var(--text)}
+.top-nav a.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+.menu-toggle {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  font-size: 23px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.menu-toggle:hover {
+  background: rgba(255,255,255,.22);
+}
+
+
+/* ==============================
+   SIDEBAR OVERLAY
+================================ */
+
+.sidebar-overlay {
+  display: none;
+}
+
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+.stat-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:16px 20px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;color:var(--primary)}
+.stat-label{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-blue{background:var(--blue-light);color:#1d4ed8}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-teal{background:var(--teal-light);color:#0f766e}
+.badge-amber{background:var(--amber-light);color:#92400e}
+.badge-red{background:var(--red-light);color:#991b1b}
+.badge-gray{background:#f1f5f9;color:var(--muted)}
+.badge-purple{background:#f3e8ff;color:#6b21a8}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-weight:600;border:none;transition:.15s;font-size:14px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-light)}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#0f766e}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--light)}
+.btn-ghost{background:transparent;color:var(--primary);border:none;padding:6px 10px}.btn-ghost:hover{background:var(--primary-bg)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#b91c1c}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:#b45309}
+.btn-sm{padding:5px 11px;font-size:13px}
+.btn-lg{padding:12px 24px;font-size:16px}
+.btn-block{width:100%;justify-content:center}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.form-control{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);transition:.15s}
+.form-control:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* PROGRESS */
+.progress-bar{height:8px;background:var(--light);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .5s ease}
+.step-indicator{display:flex;gap:0;margin-bottom:24px}
+.step{flex:1;text-align:center;position:relative}
+.step::before{content:'';position:absolute;top:14px;left:-50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step:first-child::before{display:none}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin:0 auto 6px;position:relative;z-index:1}
+.step.active .step-dot{background:var(--primary);color:#fff}
+.step.done .step-dot{background:var(--teal);color:#fff}
+.step.active::before,.step.done::before{background:var(--teal)}
+.step-label{font-size:11px;color:var(--muted)}
+.step.active .step-label{color:var(--primary);font-weight:600}
+
+/* CHAT */
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:400px}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat-bubble{max-width:75%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6}
+.chat-bubble.user{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-bubble.ai{background:var(--card);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);background:var(--card)}
+.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;resize:none;max-height:100px}
+.chat-input:focus{outline:none;border-color:var(--primary)}
+.quick-chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+.chip{padding:6px 13px;border-radius:20px;background:var(--primary-bg);color:var(--primary);font-size:13px;font-weight:500;border:1px solid rgba(30,58,95,.2);cursor:pointer;transition:.15s}
+.chip:hover{background:var(--primary);color:#fff}
+
+/* AGENT PANEL */
+.agent-panel{background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:12px 0}
+.agent-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.agent-row:last-child{border-bottom:none}
+.agent-status{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.agent-status.pending{background:var(--border);color:var(--muted)}
+.agent-status.running{background:var(--amber-light);color:var(--amber);animation:pulse 1s infinite}
+.agent-status.done{background:#dcfce7;color:#15803d}
+.agent-status.error{background:var(--red-light);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{width:20px;height:20px;border-radius:50%;position:absolute;left:-28px;top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:1}
+.tl-dot.done{background:var(--teal);color:#fff}
+.tl-dot.active{background:var(--primary);color:#fff;box-shadow:0 0 0 3px var(--primary-bg)}
+.tl-dot.pending{background:var(--border);color:var(--muted)}
+.tl-title{font-weight:600;font-size:14px}
+.tl-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table th{background:var(--light);padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:hover td{background:#fafbfc}
+.data-table tr:last-child td{border-bottom:none}
+
+/* ALERTS */
+.alert{padding:12px 16px;border-radius:8px;font-size:14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.alert-amber{background:var(--amber-light);border:1px solid #fcd34d;color:#78350f}
+.alert-red{background:var(--red-light);border:1px solid #fca5a5;color:#7f1d1d}
+.alert-green{background:#dcfce7;border:1px solid #86efac;color:#14532d}
+.alert-blue{background:var(--blue-light);border:1px solid #93c5fd;color:#1e3a8a}
+
+/* SECTION HEADERS */
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:700;color:var(--text)}
+.page-sub{color:var(--muted);font-size:14px;margin-top:4px}
+.section-title{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--text)}
+
+/* SKILL CHIP */
+.skill-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--primary-bg);border-radius:20px;font-size:13px;color:var(--primary);margin:3px}
+
+/* RISK BADGE */
+.risk-high{background:var(--red-light);color:var(--red);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.risk-medium{background:var(--amber-light);color:var(--amber);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700}
+.risk-low{background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700}
+
+/* MAP */
+.map-container{background:var(--light);border-radius:var(--radius);overflow:hidden;position:relative}
+.map-legend{position:absolute;bottom:12px;right:12px;background:rgba(255,255,255,.95);border-radius:8px;padding:8px 12px;font-size:12px;border:1px solid var(--border)}
+
+/* MISC */
+.divider{height:1px;background:var(--border);margin:20px 0}
+.flex{display:flex}.flex-center{align-items:center}.flex-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}.mt-24{margin-top:24px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+.text-sm{font-size:13px}.text-xs{font-size:12px}.text-muted{color:var(--muted)}.text-bold{font-weight:700}
+.hidden{display:none!important}
+.page{display:none}.page.active{display:block}
+.w-full{width:100%}
+.scheme-card{border-left:4px solid var(--border)}
+.scheme-eligible{border-left-color:var(--teal)}
+.scheme-potential{border-left-color:var(--amber)}
+.scheme-pending{border-left-color:var(--blue)}
+.scheme-insufficient{border-left-color:var(--muted)}
+.wage-bar-container{margin:16px 0}
+.wage-bar-label{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.wage-bar{height:24px;background:var(--light);border-radius:6px;overflow:hidden;position:relative}
+.wage-bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:700;color:#fff;transition:width .8s ease}
+.job-card{cursor:pointer;transition:.15s}.job-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.match-badge{background:var(--primary-bg);color:var(--primary);padding:4px 10px;border-radius:20px;font-size:13px;font-weight:700}
+.notification-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.notif-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.notif-unread{background:var(--card);font-weight:500}
+.notif-read{opacity:.65}
+.orchestrator-diagram{display:flex;flex-direction:column;align-items:center;gap:0;padding:20px 0}
+.orch-node{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:10px 18px;text-align:center;font-size:13px;font-weight:600;color:var(--text);min-width:160px;position:relative;transition:.3s}
+.orch-node.active-node{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
+.orch-node.done-node{border-color:var(--teal);background:var(--teal-light);color:#0f766e}
+.orch-arrow{font-size:20px;color:var(--muted);margin:4px 0;line-height:1}
+.orch-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0}
+.orch-agent{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;text-align:center;min-width:100px;transition:.3s}
+.orch-agent.active-node{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
+.orch-agent.done-node{border-color:var(--teal);background:var(--teal-light);color:#0f766e}
+.orch-agent.risk-node{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.training-card{border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:.15s}
+.training-card:hover{box-shadow:var(--shadow-md)}
+.filter-tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:.15s}
+.filter-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.trust-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.trust-ai{background:var(--blue-light);color:#1d4ed8}
+.trust-hv{background:#dcfce7;color:#15803d}
+.trust-sv{background:var(--teal-light);color:#0f766e}
+.trust-demo{background:var(--light);color:var(--muted)}
+.trust-vr{background:var(--amber-light);color:#92400e}
+.landing-hero{background:linear-gradient(135deg,var(--primary) 0%,#2d5a9e 60%,#1e4d8c 100%);color:#fff;padding:64px 32px;text-align:center;border-radius:0}
+.hero-title{font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px}
+.hero-sub{font-size:17px;opacity:.88;max-width:560px;margin:0 auto 28px}
+.feature-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius);padding:20px;text-align:center}
+.feature-icon{font-size:28px;margin-bottom:10px}
+.agentic-flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:20px;background:rgba(255,255,255,.07);border-radius:12px;margin-top:24px}
+.flow-node{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600}
+.flow-arrow{color:rgba(255,255,255,.5);font-size:16px}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .form-row{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-title{font-size:26px}
+  .content-area{padding:16px}
+  .orch-row{gap:6px}
+  .orch-agent{min-width:80px;font-size:11px}
+}
+
+
+/* ==============================
+   MOBILE / RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .topbar-brand {
+    gap: 8px;
+  }
+
+  /* Show menu button */
+  .menu-toggle {
+    display: flex;
+  }
+
+  /* Sidebar becomes slide-out menu */
+  .sidebar {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 56px;
+    bottom: 0;
+
+    width: 260px;
+    height: calc(100vh - 56px);
+
+    z-index: 200;
+
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+
+    box-shadow: 4px 0 15px rgba(0,0,0,.12);
+  }
+
+  /* Sidebar open */
+  .sidebar.menu-open {
+    transform: translateX(0);
+  }
+
+  /* Dark background behind sidebar */
+  .sidebar-overlay {
+    position: fixed;
+    inset: 56px 0 0 0;
+
+    background: rgba(15,23,42,.45);
+
+    z-index: 150;
+
+    opacity: 0;
+    visibility: hidden;
+
+    display: block;
+
+    transition:
+      opacity .25s ease,
+      visibility .25s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Make content use full width */
+  .content-area {
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* Hide role select text on very small screens */
+  .role-select {
+    max-width: 150px;
+  }
+}
+
+
+/* ==============================
+   SMALL PHONES
+================================ */
+
+@media (max-width: 480px) {
+
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .topbar-brand {
+    font-size: 18px;
+  }
+
+  .topbar-right {
+    gap: 6px;
+  }
+
+  .role-select {
+    /* max-width: 42px; */
+    padding: 6px;
+    /* font-size: 0; */
+  }
+
+  .role-select option {
+    font-size: 13px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .sidebar {
+    width: 80%;
+    max-width: 280px;
+    padding-bottom: 70px;
+  }
+}
+
+
+/* ==============================
+   PREVENT BODY SCROLL WHEN MENU OPEN
+================================ */
+
+body.menu-active {
+  overflow: hidden;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu">
+        ☰
+      </button>
+
+      <span>सहाय</span> 
+      <!-- Sahaay -->
+    </div>
+    <div class="topbar-right">
+      <select class="role-select" id="roleSelect" onchange="switchRole(this.value)">
+        <option value="worker">👷 Migrant Worker</option>
+        <option value="ngo">🤝 NGO Field Officer</option>
+        <option value="govt">🏛 Government Officer</option>
+      </select>
+      <div class="avatar" id="avatarEl">RK</div>
+    </div>
+  </div>
+
+  <!-- WORKER LAYOUT -->
+  <div id="workerLayout" class="main-layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-nav" id="workerNav">
+        <div class="sidebar-section">Main</div>
+        <a href="#" onclick="showPage('landing')" id="nav-landing"><span class="nav-icon">🏠</span> Home</a>
+        <a href="#" onclick="showPage('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span> My Dashboard</a>
+        <a href="#" onclick="showPage('profile')" id="nav-profile"><span class="nav-icon">👤</span> My Profile</a>
+        <div class="sidebar-section">Services</div>
+        <a href="#" onclick="showPage('skills')" id="nav-skills"><span class="nav-icon">🔧</span> Skills</a>
+        <a href="#" onclick="showPage('welfare')" id="nav-welfare"><span class="nav-icon">🛡</span> Welfare</a>
+        <a href="#" onclick="showPage('wage')" id="nav-wage"><span class="nav-icon">💰</span> Wage Fairness</a>
+        <a href="#" onclick="showPage('safety')" id="nav-safety"><span class="nav-icon">⛑</span> Safety</a>
+        <a href="#" onclick="showPage('jobs')" id="nav-jobs"><span class="nav-icon">💼</span> Jobs</a>
+        <a href="#" onclick="showPage('training')" id="nav-training"><span class="nav-icon">📚</span> Training</a>
+        <div class="sidebar-section">Support</div>
+        <a href="#" onclick="showPage('chat')" id="nav-chat"><span class="nav-icon">🤖</span> Sahaay AI</a>
+        <a href="#" onclick="showPage('grievance')" id="nav-grievance"><span class="nav-icon">📋</span> Grievances</a>
+        <a href="#" onclick="showPage('notifications')" id="nav-notifications"><span class="nav-icon">🔔</span> Notifications</a>
+        <div class="sidebar-section">Platform</div>
+        <a href="#" onclick="showPage('orchestrator')" id="nav-orchestrator"><span class="nav-icon">⚙</span> AI Architecture</a>
+        <a href="#" onclick="showPage('registration')" id="nav-registration"><span class="nav-icon">📝</span> Registration</a>
+      </div>
+    </nav>
+    <main class="content-area" id="workerContent">
+      <!-- Pages will be rendered here -->
+    </main>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- NGO LAYOUT -->
+  <div id="ngoLayout" class="hidden" style="flex-direction:column;flex:1">
+    <div class="top-nav" id="ngoNav">
+      <a href="#" onclick="showNgoPage('ngo-overview')" id="nnav-ngo-overview" class="active">Overview</a>
+      <a href="#" onclick="showNgoPage('ngo-workers')" id="nnav-ngo-workers">Workers</a>
+      <a href="#" onclick="showNgoPage('ngo-welfare')" id="nnav-ngo-welfare">Welfare</a>
+      <a href="#" onclick="showNgoPage('ngo-cases')" id="nnav-ngo-cases">Cases</a>
+    </div>
+    <div class="content-area" id="ngoContent"></div>
+  </div>
+
+  <!-- GOVT LAYOUT -->
+  <div id="govtLayout" class="hidden" style="flex-direction:column;flex:1">
+    <div class="top-nav" id="govtNav">
+      <a href="#" onclick="showGovtPage('govt-dashboard')" id="gnav-govt-dashboard" class="active">Dashboard</a>
+      <a href="#" onclick="showGovtPage('govt-map')" id="gnav-govt-map">Worker Map</a>
+      <a href="#" onclick="showGovtPage('govt-welfare')" id="gnav-govt-welfare">Welfare</a>
+      <a href="#" onclick="showGovtPage('govt-wage')" id="gnav-govt-wage">Wage Risks</a>
+      <a href="#" onclick="showGovtPage('govt-safety')" id="gnav-govt-safety">Safety</a>
+      <a href="#" onclick="showGovtPage('govt-grievances')" id="gnav-govt-grievances">Grievances</a>
+      <a href="#" onclick="showGovtPage('govt-cases')" id="gnav-govt-cases">Cases</a>
+      <a href="#" onclick="showGovtPage('govt-intelligence')" id="gnav-govt-intelligence">AI Intelligence</a>
+    </div>
+    <div class="content-area" id="govtContent"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let currentRole = 'worker';
+let currentPage = 'landing';
+let currentNgoPage = 'ngo-overview';
+let currentGovtPage = 'govt-dashboard';
+let demoCaseCreated = false;
+let chatHistory = [];
+let regStep = 1;
+let welfareFilter = 'all';
+
+const workerData = {
+  name:'Ramesh Kumar', age:34, gender:'Male', nativeState:'Odisha',
+  location:'Surat, Gujarat', industry:'Construction', occupation:'Mason',
+  experience:7, employer:'Shree Constructions Pvt Ltd', wage:500,
+  workingHours:12, skills:['Masonry','Plastering','Concrete Work'],
+  language:'Hindi', profilePct:86, riskLevel:'HIGH',
+  caseId:'GJ-SRT-20481'
+};
+
+const workers = [
+  {id:'W-001',name:'Ramesh Kumar',state:'Odisha',industry:'Construction',location:'Surat',skill:'Mason',welfare:'Matched',risk:'HIGH',case:'Active'},
+  {id:'W-002',name:'Meena Devi',state:'Rajasthan',industry:'Textile',location:'Ahmedabad',skill:'Textile Op.',welfare:'Pending',risk:'MEDIUM',case:'Open'},
+  {id:'W-003',name:'Abdul Rahman',state:'West Bengal',industry:'Diamond',location:'Surat',skill:'Polisher',welfare:'Applied',risk:'LOW',case:'None'},
+  {id:'W-004',name:'Sita Das',state:'Odisha',industry:'Construction',location:'Vadodara',skill:'Helper',welfare:'Eligible',risk:'MEDIUM',case:'None'},
+];
+
+const schemes = [
+  {id:'S1',name:'BOCW Health Assistance',type:'Health',status:'eligible',statusLabel:'Eligible',reason:'Registered construction worker with valid BOCW card eligibility',docs:['BOCW Card','ID Proof','Medical Certificate'],color:'teal',dot:'🟢'},
+  {id:'S2',name:'PM Jan Arogya Yojana (PMJAY)',type:'Health Insurance',status:'potential',statusLabel:'Potentially Eligible',reason:'Income and occupation criteria appear to match; Aadhaar linkage required',docs:['Aadhaar','Ration Card','Income Proof'],color:'amber',dot:'🟡'},
+  {id:'S3',name:'PM Awas Yojana',type:'Housing',status:'pending',statusLabel:'Verification Required',reason:'Migrant worker without permanent Gujarat address; requires employer certificate',docs:['Employer Certificate','Address Proof','Bank Account'],color:'blue',dot:'🔵'},
+  {id:'S4',name:'BOCW Education Assistance',type:'Education',status:'potential',statusLabel:'Potentially Eligible',reason:'Worker has school-age children declared in registration',docs:['Child Birth Certificate','School Enrollment','BOCW Card'],color:'amber',dot:'🟡'},
+  {id:'S5',name:'Gujarat Migrant Worker Scheme',type:'Welfare',status:'insufficient',statusLabel:'Insufficient Info',reason:'Requires inter-state migrant registration under ISMW Act',docs:['Inter-state Migrant Card','Home State ID','Bank Account'],color:'gray',dot:'⚪'},
+];
+
+const jobs = [
+  {id:'J1',title:'Senior Mason',company:'Kaveri Builders',location:'Surat',match:94,wage:620,skills:['Masonry','Plastering'],posted:'2 days ago'},
+  {id:'J2',title:'Mason',company:'Saurashtra Infra',location:'Ahmedabad',match:87,wage:580,skills:['Masonry','Concrete Work'],posted:'4 days ago'},
+  {id:'J3',title:'Construction Supervisor',company:'GVK Projects',location:'Surat',match:72,wage:750,skills:['Site Management','Safety Cert.'],posted:'1 week ago'},
+  {id:'J4',title:'Plastering Expert',company:'Urban Build Co.',location:'Vadodara',match:81,wage:560,skills:['Plastering','Concrete Work'],posted:'3 days ago'},
+];
+
+const trainings = [
+  {id:'T1',title:'Advanced Masonry & Quality Check',duration:'5 days',provider:'ITI Surat',location:'Surat, Gujarat',status:'recommended'},
+  {id:'T2',title:'Construction Safety & First Aid',duration:'3 days',provider:'NSDC Partner',location:'Surat, Gujarat',status:'recommended'},
+  {id:'T3',title:'Site Supervision Basics',duration:'10 days',provider:'CIDC',location:'Ahmedabad, Gujarat',status:'recommended'},
+];
+
+const notifications = [
+  {id:'N1',icon:'🛡',title:'Welfare scheme matched','msg':'BOCW Health Assistance — you may be eligible. Complete your application.','time':'2 hours ago','read':false,'type':'welfare'},
+  {id:'N2',icon:'📄',title:'Document reminder','msg':'Upload employer certificate to complete PM Awas Yojana application.','time':'Yesterday','read':false,'type':'doc'},
+  {id:'N3',icon:'💼',title:'New job match','msg':'Senior Mason at Kaveri Builders — 94% match found in Surat.','time':'Yesterday','read':true,'type':'job'},
+  {id:'N4',icon:'📚',title:'Training opportunity','msg':'Advanced Masonry course starts next week at ITI Surat.','time':'2 days ago','read':true,'type':'training'},
+  {id:'N5',icon:'📋',title:'Grievance update','msg':'Case #GJ-SRT-20481 status updated to: Under Investigation.','time':'3 days ago','read':true,'type':'grievance'},
+];
+
+const govtInsights = [
+  {id:'I1',title:'Emerging Safety Cluster',desc:'Construction safety reports increased 34% in Surat South zone over the past 14 days. Workers reporting missing PPE and inadequate fall protection.',risk:'High',action:'Targeted field verification and employer notice recommended.',conf:87,period:'Last 14 days',source:'Safety Report Aggregation Module'},
+  {id:'I2',title:'Welfare Coverage Gap',desc:'Approximately 1,200 workers potentially eligible for BOCW benefits have not completed applications. Drop-off at document upload stage.','risk':'Medium',action:'Deploy NGO field officers for assisted application drives in Surat and Ahmedabad.',conf:82,period:'Last 30 days',source:'Welfare Eligibility Engine'},
+  {id:'I3',title:'Wage Risk Pattern',desc:'23 workers in textile sector reporting wages below demo benchmark. Cluster concentrated in Ahmedabad East.',risk:'High',action:'Issue wage compliance notices to flagged employers. Schedule labor inspector visits.',conf:79,period:'Last 21 days',source:'Wage Fairness Agent'},
+];
+
+// ============================================================
+// ROUTING
+// ============================================================
+function switchRole(role) {
+  console.log(role)
+  currentRole = role;
+  if(document.getElementById('workerLayout')){
+    document.getElementById('workerLayout').style.display = role==='worker'?'flex':'none';
+    document.getElementById('workerLayout')?.classList.remove('hidden');
+  }
+  if(document.getElementById('ngoLayout')){
+    document.getElementById('ngoLayout').style.display = role==='ngo'?'flex':'none';
+    document.getElementById('ngoLayout')?.classList.remove('hidden');
+  }
+  if(document.getElementById('govtLayout')){
+    document.getElementById('govtLayout').style.display = role==='govt'?'flex':'none';
+    document.getElementById('govtLayout')?.classList.remove('hidden');
+  }
+  const avatars = {worker:'RK',ngo:'NO',govt:'GO'};
+  const names = {worker:'Ramesh Kumar',ngo:'NGO Officer',govt:'Govt. Officer'};
+  document.getElementById('avatarEl').textContent = avatars[role];
+  if(role==='worker'){ renderPage('landing'); setActiveNav('nav-landing'); }
+  else if(role==='ngo'){ renderNgoPage('ngo-overview'); setActiveNgoNav('ngo-overview'); }
+  else { renderGovtPage('govt-dashboard'); setActiveGovtNav('govt-dashboard'); }
+}
+
+function showPage(page) {
+  currentPage = page;
+  setActiveNav('nav-'+page);
+  renderPage(page);
+  return false;
+}
+function showNgoPage(page) {
+  currentNgoPage = page;
+  setActiveNgoNav(page);
+  renderNgoPage(page);
+  return false;
+}
+function showGovtPage(page) {
+  currentGovtPage = page;
+  setActiveGovtNav(page);
+  renderGovtPage(page);
+  return false;
+}
+
+function setActiveNav(id) {
+  document.querySelectorAll('#workerNav a').forEach(a=>a.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+function setActiveNgoNav(page) {
+  document.querySelectorAll('#ngoNav a').forEach(a=>a.classList.remove('active'));
+  const el = document.getElementById('nnav-'+page);
+  if(el) el.classList.add('active');
+}
+function setActiveGovtNav(page) {
+  document.querySelectorAll('#govtNav a').forEach(a=>a.classList.remove('active'));
+  const el = document.getElementById('gnav-'+page);
+  if(el) el.classList.add('active');
+}
+
+function renderPage(page) {
+  const el = document.getElementById('workerContent');
+  const renderers = {
+    landing: renderLanding,
+    dashboard: renderDashboard,
+    profile: renderProfile,
+    registration: renderRegistration,
+    skills: renderSkills,
+    welfare: renderWelfare,
+    welfareApp: renderWelfareApp,
+    wage: renderWage,
+    safety: renderSafety,
+    jobs: renderJobs,
+    training: renderTraining,
+    chat: renderChat,
+    grievance: renderGrievance,
+    notifications: renderNotifications,
+    orchestrator: renderOrchestrator,
+  };
+  if(renderers[page]) { el.innerHTML = renderers[page](); bindPageEvents(page); }
+}
+
+function renderNgoPage(page) {
+  const el = document.getElementById('ngoContent');
+  if(page==='ngo-overview') el.innerHTML = renderNgoOverview();
+  else if(page==='ngo-workers') el.innerHTML = renderNgoWorkers();
+  else if(page==='ngo-welfare') el.innerHTML = renderNgoWelfare();
+  else if(page==='ngo-cases') el.innerHTML = renderNgoCases();
+}
+
+function renderGovtPage(page) {
+  const el = document.getElementById('govtContent');
+  if(page==='govt-dashboard') { el.innerHTML = renderGovtDashboard(); drawGovtCharts(); }
+  else if(page==='govt-map') el.innerHTML = renderGovtMap();
+  else if(page==='govt-welfare') el.innerHTML = renderGovtWelfare();
+  else if(page==='govt-wage') el.innerHTML = renderGovtWage();
+  else if(page==='govt-safety') el.innerHTML = renderGovtSafety();
+  else if(page==='govt-grievances') el.innerHTML = renderGovtGrievances();
+  else if(page==='govt-cases') { el.innerHTML = renderGovtCases(); }
+  else if(page==='govt-intelligence') el.innerHTML = renderGovtIntelligence();
+}
+
+// ============================================================
+// PAGE: LANDING
+// ============================================================
+function renderLanding() {
+  return `
+<div class="landing-hero">
+  <div style="max-width:680px;margin:0 auto">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);padding:6px 14px;border-radius:20px;font-size:13px;margin-bottom:20px">
+      <span class="trust-badge trust-demo">Demo Data</span> Gujarat Pilot — Proof of Concept
+    </div>
+    <h1 class="hero-title">One Platform. Safer Work.<br>Fairer Opportunities. Better Welfare.</h1>
+    <p class="hero-sub">AI-powered support for migrant workers in Gujarat — connecting workers, NGOs, and government for better outcomes through agentic intelligence.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-lg" style="background:#fff;color:var(--primary)" onclick="showPage('registration')">📝 Get Started</button>
+      <button class="btn btn-lg" style="background:var(--teal);color:#fff" onclick="showPage('chat')">🤖 Talk to Sahaay AI</button>
+      <button class="btn btn-lg" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4)" onclick="switchRole('govt');document.getElementById('roleSelect').value='govt'">🏛 Explore as Officer</button>
+    </div>
+    <div class="agentic-flow" style="margin-top:28px">
+      <div class="flow-node">👷 Worker</div><div class="flow-arrow">→</div>
+      <div class="flow-node">⚙ Orchestrator</div><div class="flow-arrow">→</div>
+      <div class="flow-node">🔧 Skill</div><div class="flow-arrow">|</div>
+      <div class="flow-node">🛡 Welfare</div><div class="flow-arrow">|</div>
+      <div class="flow-node">💰 Wage</div><div class="flow-arrow">|</div>
+      <div class="flow-node">⛑ Safety</div><div class="flow-arrow">→</div>
+      <div class="flow-node">🏛 Officer</div><div class="flow-arrow">→</div>
+      <div class="flow-node">✅ Action</div>
+    </div>
+  </div>
+</div>
+<div style="max-width:960px;margin:0 auto;padding:32px 0">
+  <div class="stat-grid" style="margin-bottom:32px">
+    ${[['12,480','Workers Registered'],['8,920','Welfare Matches'],['2,140','Cases Assisted'],['1,760','Safety Reports'],['94%','Follow-up Rate']].map(([n,l])=>`<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div><div style="margin-top:6px"><span class="trust-badge trust-demo">Demo Data</span></div></div>`).join('')}
+  </div>
+  <h2 class="section-title" style="text-align:center;font-size:20px;margin-bottom:20px">Platform Features</h2>
+  <div class="card-grid" style="margin-bottom:32px">
+    ${[['🔧','Skill Mapping','AI-powered assessment of worker skills from self-description and experience'],
+       ['🛡','Welfare Discovery','Match workers to eligible government schemes automatically'],
+       ['💰','Wage Fairness','Compare wages against benchmarks and detect potential violations'],
+       ['⛑','Safety Reporting','Multi-modal safety incident reporting with AI extraction'],
+       ['💼','Job Matching','Skill-based job recommendations from verified employers'],
+       ['📚','Skill Development','Identify gaps and connect to training programs']].map(([i,t,d])=>`
+    <div class="card" style="text-align:center;cursor:pointer" onclick="showPage('chat')">
+      <div style="font-size:28px;margin-bottom:10px">${i}</div>
+      <div style="font-weight:700;margin-bottom:6px">${t}</div>
+      <div class="text-sm text-muted">${d}</div>
+    </div>`).join('')}
+  </div>
+  <div class="card" style="background:var(--primary-bg);border-color:rgba(30,58,95,.15);text-align:center">
+    <h3 style="color:var(--primary);margin-bottom:8px">How Sahaay Works</h3>
+    <p class="text-sm text-muted" style="max-width:500px;margin:0 auto 16px">Workers describe their situation in any language. The Master Orchestrator routes to specialized AI agents that analyze skills, welfare eligibility, wage fairness, and safety — then flags cases for human officer review.</p>
+    <button class="btn btn-primary" onclick="showPage('orchestrator')">⚙ See AI Architecture</button>
+  </div>
+</div>`;
+}
+
+// ============================================================
+// PAGE: WORKER DASHBOARD
+// ============================================================
+function renderDashboard() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">Welcome back, ${workerData.name} 👋</div>
+  <div class="page-sub">${workerData.occupation} · ${workerData.location} · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+</div>
+<div class="card-grid">
+  <div class="card" style="cursor:pointer" onclick="showPage('profile')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">My Profile</div><span class="badge badge-blue">📄 ${workerData.profilePct}% complete</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${workerData.profilePct}%"></div></div>
+    <div class="text-sm text-muted mt-8">Tap to view and complete your profile</div>
+  </div>
+  <div class="card" style="cursor:pointer" onclick="showPage('skills')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">🔧 Skill Profile</div><span class="badge badge-teal">AI-assessed</span></div>
+    <div style="font-size:15px;font-weight:600">Advanced Mason</div>
+    <div class="text-sm text-muted">7 years experience · Masonry, Plastering, Concrete Work</div>
+    <div class="text-xs text-muted mt-8">Confidence: 91%</div>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--teal)" onclick="showPage('welfare')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">🛡 Welfare Benefits</div><span class="badge badge-green">5 matched</span></div>
+    <div class="text-sm">You may be eligible for <strong>5 welfare schemes</strong></div>
+    <button class="btn btn-teal btn-sm mt-12">Check My Benefits →</button>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--amber)" onclick="showPage('wage')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">💰 Wage Fairness</div><span class="badge badge-amber">⚠ Concern</span></div>
+    <div class="text-sm">Potential concern detected for your current wage</div>
+    <button class="btn btn-amber btn-sm mt-12">Understand My Wage →</button>
+  </div>
+  <div class="card" style="cursor:pointer" onclick="showPage('safety')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">⛑ Workplace Safety</div><span class="badge badge-gray">No active reports</span></div>
+    <div class="text-sm text-muted">No active safety reports</div>
+    <button class="btn btn-outline btn-sm mt-12">Report an Issue →</button>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--primary)" onclick="showPage('jobs')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">💼 Job Matches</div><span class="badge badge-blue">8 matches</span></div>
+    <div class="text-sm text-muted">New jobs matching your skills found</div>
+    <button class="btn btn-primary btn-sm mt-12">View Jobs →</button>
+  </div>
+  <div class="card" style="cursor:pointer" onclick="showPage('training')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">📚 Training</div><span class="badge badge-purple">3 opportunities</span></div>
+    <div class="text-sm text-muted">Advance your skills and career</div>
+    <button class="btn btn-outline btn-sm mt-12">Explore Training →</button>
+  </div>
+  <div class="card" style="cursor:pointer;border-left:3px solid var(--red)" onclick="showPage('grievance')">
+    <div class="flex flex-between flex-center mb-8"><div style="font-weight:700">📋 Grievances</div><span class="risk-high">Active</span></div>
+    <div class="text-sm">Case <strong>#${workerData.caseId}</strong> · Safety · Under Investigation</div>
+    <button class="btn btn-outline btn-sm mt-12">Track Case →</button>
+  </div>
+</div>
+<div class="card mt-16" style="background:linear-gradient(135deg,var(--primary-bg),#e0eaff)">
+  <div class="flex flex-between flex-center">
+    <div>
+      <div style="font-weight:700;color:var(--primary)">🤖 Talk to Sahaay AI</div>
+      <div class="text-sm text-muted mt-8">Get instant answers about your rights, benefits, and workplace safety</div>
+    </div>
+    <button class="btn btn-primary" onclick="showPage('chat')">Start Chat →</button>
+  </div>
+</div>`;
+}
+
+// ============================================================
+// PAGE: PROFILE
+// ============================================================
+function renderProfile() {
+  return `
+<div class="page-header"><div class="page-title">My Profile</div><div class="page-sub">Manage your personal and work information</div></div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px">
+  <div>
+    <div class="card" style="text-align:center">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">RK</div>
+      <div style="font-weight:700;font-size:16px">${workerData.name}</div>
+      <div class="text-sm text-muted">${workerData.occupation}</div>
+      <div class="text-sm text-muted">${workerData.location}</div>
+      <div class="mt-12"><span class="trust-badge trust-demo">Demo Data</span></div>
+      <div class="mt-12">
+        <div class="text-xs text-muted mb-8">Profile Completion</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${workerData.profilePct}%"></div></div>
+        <div class="text-xs text-muted mt-8">${workerData.profilePct}% complete</div>
+      </div>
+      <button class="btn btn-outline btn-sm btn-block mt-12" onclick="showPage('registration')">Edit Profile</button>
+    </div>
+    <div class="card mt-12">
+      <div class="section-title" style="font-size:14px">Risk Assessment <span class="trust-badge trust-ai">AI-assisted</span></div>
+      <div class="flex flex-center gap-8 mt-8"><span class="risk-high">HIGH RISK</span></div>
+      <div class="text-xs text-muted mt-8">Wage concern + Safety concern + Extended hours</div>
+      <button class="btn btn-outline btn-sm btn-block mt-12" onclick="showPage('orchestrator')">View AI Analysis</button>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="section-title">Personal Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        ${[['Full Name',workerData.name],['Age',workerData.age+' years'],['Gender',workerData.gender],['Native State',workerData.nativeState],['Current Location',workerData.location],['Preferred Language',workerData.language]].map(([l,v])=>`<div><div class="text-xs text-muted">${l}</div><div style="font-weight:600;margin-top:2px">${v}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card mt-16">
+      <div class="section-title">Work Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        ${[['Industry',workerData.industry],['Occupation',workerData.occupation],['Experience',workerData.experience+' years'],['Employer',workerData.employer],['Daily Wage','₹'+workerData.wage+'/day'],['Working Hours',workerData.workingHours+' hrs/day']].map(([l,v])=>`<div><div class="text-xs text-muted">${l}</div><div style="font-weight:600;margin-top:2px">${v}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card mt-16">
+      <div class="flex flex-between flex-center mb-12"><div class="section-title" style="margin:0">Skills</div><span class="trust-badge trust-ai">AI-assessed</span></div>
+      <div>${workerData.skills.map(s=>`<span class="skill-chip">✓ ${s}</span>`).join('')}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ============================================================
+// PAGE: REGISTRATION
+// ============================================================
+function renderRegistration() {
+  const steps = ['Basic Info','Work Info','Skills','Consent'];
+  const stepHTML = steps.map((s,i)=>{
+    const cls = i+1===regStep?'active':i+1<regStep?'done':'';
+    return `<div class="step ${cls}"><div class="step-dot">${i+1<regStep?'✓':i+1}</div><div class="step-label">${s}</div></div>`;
+  }).join('');
+  const stepContents = {
+    1:`<div class="form-row"><div class="form-group"><label class="form-label">Full Name *</label><input class="form-control" id="reg-name" placeholder="Enter full name" value=""></div><div class="form-group"><label class="form-label">Age *</label><input class="form-control" id="reg-age" type="number" placeholder="Age"></div></div>
+       <div class="form-row"><div class="form-group"><label class="form-label">Gender</label><select class="form-control" id="reg-gender"><option>Male</option><option>Female</option><option>Other</option></select></div><div class="form-group"><label class="form-label">Native State *</label><select class="form-control" id="reg-state"><option>Odisha</option><option>West Bengal</option><option>Rajasthan</option><option>Uttar Pradesh</option><option>Bihar</option><option>Madhya Pradesh</option></select></div></div>
+       <div class="form-group"><label class="form-label">Current Location in Gujarat *</label><input class="form-control" id="reg-location" placeholder="City, District"></div>`,
+    2:`<div class="form-row"><div class="form-group"><label class="form-label">Industry *</label><select class="form-control" id="reg-industry"><option>Construction</option><option>Textile</option><option>Diamond</option><option>Agriculture</option><option>Manufacturing</option></select></div><div class="form-group"><label class="form-label">Occupation *</label><input class="form-control" id="reg-occ" placeholder="e.g. Mason, Weaver"></div></div>
+       <div class="form-row"><div class="form-group"><label class="form-label">Experience (years)</label><input class="form-control" id="reg-exp" type="number" placeholder="Years"></div><div class="form-group"><label class="form-label">Employer Name</label><input class="form-control" id="reg-emp" placeholder="Company or contractor"></div></div>
+       <div class="form-row"><div class="form-group"><label class="form-label">Daily Wage (₹)</label><input class="form-control" id="reg-wage" type="number" placeholder="Amount per day"></div><div class="form-group"><label class="form-label">Working Hours / Day</label><input class="form-control" id="reg-hours" type="number" placeholder="Hours"></div></div>`,
+    3:`<div class="form-group"><label class="form-label">Select Your Skills</label>
+       <div style="display:flex;flex-wrap:wrap;gap:8px">
+         ${['Masonry','Plastering','Concrete Work','Welding','Carpentry','Electrical','Plumbing','Painting','Textile Operating','Diamond Polishing','Embroidery','Data Entry'].map(s=>`<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px"><input type="checkbox" class="reg-skill" value="${s}"> ${s}</label>`).join('')}
+       </div>
+       </div>
+       <div class="form-group"><label class="form-label">Preferred Language</label><select class="form-control" id="reg-lang"><option>Hindi</option><option>Gujarati</option><option>Odia</option><option>Bengali</option><option>English</option></select></div>`,
+    4:`<div class="card" style="background:var(--light)">
+       <div style="font-weight:700;margin-bottom:10px">Privacy & Consent</div>
+       <div class="text-sm text-muted" style="margin-bottom:16px">Your data is used solely for welfare matching, job recommendations, and safety monitoring. You control what is shared and can request deletion at any time.</div>
+       ${[['I consent to my data being used for welfare scheme matching.','c1'],['I consent to anonymous, aggregated data being shared with government departments.','c2'],['I understand AI-assisted screening is advisory and not a legal determination.','c3']].map(([t,id])=>`<label style="display:flex;gap:10px;margin-bottom:12px;cursor:pointer"><input type="checkbox" id="${id}"> <span class="text-sm">${t}</span></label>`).join('')}
+       </div>
+       <div class="alert alert-blue mt-12">✅ Your registration will be reviewed by an NGO field officer within 48 hours.</div>`
+  };
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">Worker Registration</div><div class="page-sub">Step ${regStep} of 4</div></div>
+  <button class="btn btn-outline btn-sm" onclick="prefillDemo()">📋 Load Demo Data</button>
+</div>
+<div class="card">
+  <div class="step-indicator">${stepHTML}</div>
+  <div id="reg-voice-area" style="margin-bottom:20px">
+    <button class="btn btn-outline btn-block" id="voiceBtn" onclick="startVoiceReg()">🎙 Tell us about yourself (Voice Registration)</button>
+    <div id="voiceOutput" class="hidden mt-12"></div>
+  </div>
+  <div id="reg-step-content">${stepContents[regStep]}</div>
+  <div class="flex flex-between mt-20">
+    <button class="btn btn-outline" onclick="regPrev()" ${regStep===1?'disabled':''}>← Back</button>
+    <button class="btn btn-primary" onclick="regNext()">${regStep===4?'✅ Submit Registration':'Next →'}</button>
+  </div>
+</div>`;
+}
+
+function prefillDemo() {
+  regStep = 1;
+  renderPage('registration');
+  setTimeout(()=>{
+    const fields = {
+      'reg-name':workerData.name,'reg-age':workerData.age,'reg-location':workerData.location,
+      'reg-occ':workerData.occupation,'reg-exp':workerData.experience,'reg-emp':workerData.employer,
+      'reg-wage':workerData.wage,'reg-hours':workerData.workingHours
+    };
+    Object.entries(fields).forEach(([id,v])=>{ const el=document.getElementById(id); if(el)el.value=v; });
+    const stateEl=document.getElementById('reg-state'); if(stateEl) stateEl.value='Odisha';
+    const gEl=document.getElementById('reg-gender'); if(gEl) gEl.value='Male';
+  },100);
+}
+
+function startVoiceReg() {
+  const btn = document.getElementById('voiceBtn');
+  const out = document.getElementById('voiceOutput');
+  btn.innerHTML = '🔴 Listening...';
+  btn.disabled = true;
+  out.classList.remove('hidden');
+  out.innerHTML = `<div class="alert alert-blue" style="font-size:13px">🎙 Listening... speak now</div>`;
+  setTimeout(()=>{
+    out.innerHTML = `<div class="card" style="background:var(--light)">
+      <div class="text-xs text-muted mb-8">Transcribed (Hindi → English)</div>
+      <div style="font-style:italic;font-size:14px">"I am a mason from Odisha. I have worked in construction for seven years and currently work in Surat. I also know plastering and concrete work."</div>
+    </div>`;
+    btn.innerHTML = '⚙ AI Processing...';
+  },1800);
+  setTimeout(()=>{
+    out.innerHTML += `<div class="alert alert-green mt-8">✅ AI extracted your profile. Form auto-filled below. <span class="trust-badge trust-ai">AI-assisted</span></div>`;
+    btn.innerHTML = '✅ Voice Registration Done';
+    btn.disabled = false;
+    prefillDemo();
+  },3500);
+}
+
+function regPrev() { if(regStep>1){regStep--;renderPage('registration');} }
+function regNext() {
+  if(regStep<4){regStep++;renderPage('registration');}
+  else{
+    regStep=1;
+    const el=document.getElementById('workerContent');
+    el.innerHTML=`<div class="card" style="text-align:center;max-width:480px;margin:60px auto">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <div style="font-size:20px;font-weight:700;color:var(--teal);margin-bottom:8px">Registration Submitted!</div>
+      <div class="text-sm text-muted">Your Worker ID: <strong>GJ-SRT-${Math.floor(Math.random()*90000+10000)}</strong></div>
+      <div class="alert alert-green mt-16">An NGO field officer will verify your registration within 48 hours.</div>
+      <button class="btn btn-primary btn-block mt-16" onclick="showPage('dashboard')">Go to My Dashboard →</button>
+    </div>`;
+  }
+}
+
+function bindPageEvents(page) {
+  if(page==='chat') initChat();
+}
+
+// ============================================================
+// PAGE: SKILLS
+// ============================================================
+function renderSkills() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">My Skill Profile</div><div class="page-sub">AI-assessed skills based on your experience</div></div>
+  <span class="trust-badge trust-ai">AI-assisted · 91% confidence</span>
+</div>
+<div class="alert alert-blue">🤖 Skill Mapping Confidence: <strong>91%</strong> — Worker described brickwork and plastering activities consistent with masonry and plastering. <span class="trust-badge trust-demo">Demo Data</span></div>
+<div class="card-grid mt-16">
+  ${[['Masonry','Advanced','7 years','var(--teal)','Used brickwork, block laying, and structural masonry on 12+ sites'],
+     ['Plastering','Intermediate','5 years','var(--primary)','Interior and exterior plaster finishing, float and set'],
+     ['Concrete Work','Beginner','2 years','var(--amber)','Mix preparation and basic placement under supervision']].map(([name,level,exp,col,desc])=>`
+  <div class="card">
+    <div class="flex flex-between flex-center mb-8">
+      <div style="font-weight:700">${name}</div>
+      <span class="badge" style="background:${col}20;color:${col}">${level}</span>
+    </div>
+    <div class="text-sm text-muted mb-8">${exp} experience</div>
+    <div class="text-xs text-muted">${desc}</div>
+    <div class="progress-bar mt-12">
+      <div class="progress-fill" style="width:${level==='Advanced'?85:level==='Intermediate'?55:25}%;background:${col}"></div>
+    </div>
+  </div>`).join('')}
+</div>
+<div class="card mt-16">
+  <div class="flex flex-between flex-center mb-12">
+    <div class="section-title" style="margin:0">Add a Skill</div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <select class="form-control" style="width:auto;flex:1" id="newSkillSelect">
+      <option>Select skill...</option>
+      <option>Welding</option><option>Carpentry</option><option>Electrical</option>
+      <option>Plumbing</option><option>Painting</option><option>Scaffolding</option>
+    </select>
+    <select class="form-control" style="width:auto" id="newSkillLevel">
+      <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+    </select>
+    <button class="btn btn-primary" onclick="addSkill()">+ Add Skill</button>
+  </div>
+  <div id="addSkillMsg"></div>
+</div>
+<div class="card mt-16">
+  <div class="section-title">Construction Industry Skills Taxonomy</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    ${['Masonry','Plastering','Concrete Work','Reinforcement','Carpentry','Electrical','Plumbing','Painting','Tiling','Scaffolding','Welding','Waterproofing','Formwork','Safety Supervision'].map(s=>`<span class="skill-chip">${workerData.skills.includes(s)?'✓ ':''} ${s}</span>`).join('')}
+  </div>
+</div>`;
+}
+
+function addSkill() {
+  const s = document.getElementById('newSkillSelect').value;
+  const l = document.getElementById('newSkillLevel').value;
+  const msg = document.getElementById('addSkillMsg');
+  if(s==='Select skill...'){ msg.innerHTML='<div class="alert alert-amber mt-8">Please select a skill.</div>'; return; }
+  msg.innerHTML=`<div class="alert alert-green mt-8">✅ "${s}" (${l}) added to your profile. <span class="trust-badge trust-vr">Verification required</span></div>`;
+}
+
+// ============================================================
+// PAGE: WELFARE
+// ============================================================
+function renderWelfare() {
+  const filters = ['all','eligible','potential','pending','insufficient'];
+  const filteredSchemes = welfareFilter==='all' ? schemes : schemes.filter(s=>s.status===welfareFilter);
+  return `
+<div class="page-header"><div class="page-title">Welfare & Benefits</div><div class="page-sub">Schemes matched to your profile — <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="alert alert-green">🛡 <strong>5 schemes</strong> identified as potentially relevant based on your profile. <span class="trust-badge trust-ai">AI-assisted</span></div>
+<div class="filter-tabs">
+  ${filters.map(f=>`<div class="filter-tab ${welfareFilter===f?'active':''}" onclick="setWelfareFilter('${f}')">${f.charAt(0).toUpperCase()+f.slice(1)}</div>`).join('')}
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+  ${filteredSchemes.map(s=>`
+  <div class="card scheme-card scheme-${s.status}" id="scheme-${s.id}">
+    <div class="flex flex-between flex-center mb-8">
+      <div>
+        <span style="font-size:16px">${s.dot}</span>
+        <strong style="margin-left:6px">${s.name}</strong>
+        <span class="badge badge-gray" style="margin-left:8px">${s.type}</span>
+      </div>
+      <span class="badge ${s.status==='eligible'?'badge-teal':s.status==='potential'?'badge-amber':s.status==='pending'?'badge-blue':'badge-gray'}">${s.statusLabel}</span>
+    </div>
+    <div class="text-sm text-muted mb-8">${s.reason}</div>
+    <div class="text-xs mb-8"><strong>Required Documents:</strong> ${s.docs.join(' · ')}</div>
+    <div class="flex gap-8">
+      <button class="btn btn-teal btn-sm" onclick="showPage('welfareApp')">Start Application</button>
+      <button class="btn btn-outline btn-sm" onclick="showSourcePanel('${s.id}')">View Source</button>
+    </div>
+    <div id="src-${s.id}" class="hidden mt-12" style="background:var(--light);border-radius:8px;padding:12px">
+      <div class="text-xs text-muted"><strong>Source Transparency</strong> <span class="trust-badge trust-sv">Source verified</span></div>
+      <div class="text-xs mt-8">📄 Official government notification · Demo knowledge base entry · Effective date: Demo</div>
+      <div class="text-xs text-muted mt-4">Data period: Demo · Confidence: AI-assisted</div>
+    </div>
+  </div>`).join('')}
+</div>`;
+}
+
+function setWelfareFilter(f) { welfareFilter=f; renderPage('welfare'); }
+function showSourcePanel(id) {
+  const el = document.getElementById('src-'+id);
+  if(el) el.classList.toggle('hidden');
+}
+
+// ============================================================
+// PAGE: WELFARE APPLICATION
+// ============================================================
+function renderWelfareApp() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">Welfare Application</div><div class="page-sub">BOCW Health Assistance — <span class="trust-badge trust-demo">Demo</span></div></div>
+  <button class="btn btn-outline btn-sm" onclick="showPage('welfare')">← Back</button>
+</div>
+<div class="step-indicator" style="max-width:600px">
+  ${['Scheme','Eligibility','Documents','Upload','Review','Submit'].map((s,i)=>`<div class="step ${i===2?'active':i<2?'done':''}"><div class="step-dot">${i<2?'✓':i+1}</div><div class="step-label">${s}</div></div>`).join('')}
+</div>
+<div class="card">
+  <div class="section-title">Document Checklist</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${[['✅','Identity Proof (Aadhaar Card)','Uploaded','teal'],
+       ['✅','Address Proof (Ration Card)','Uploaded','teal'],
+       ['⚠','Employer Certificate','Required','amber'],
+       ['⚪','Medical Certificate','Optional','gray']].map(([i,d,s,c])=>`
+    <div class="flex flex-center gap-12 card" style="padding:12px;border-left:3px solid var(--${c})">
+      <span style="font-size:18px">${i}</span>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${d}</div>
+      <div class="text-xs text-muted">${s}</div></div>
+      ${s==='Required'?`<button class="btn btn-outline btn-sm" onclick="simulateUpload(this)">Upload</button>`:''}
+      ${s==='Uploaded'?`<span class="badge badge-teal">✓</span>`:''}
+    </div>`).join('')}
+  </div>
+  <div class="mt-16">
+    <button class="btn btn-outline btn-sm" onclick="showAiAssist()">🤖 AI Assist — Explain Documents</button>
+    <div id="aiAssistBox" class="hidden mt-8 alert alert-blue">
+      <div style="font-size:13px">🤖 <strong>Employer Certificate:</strong> This is a letter from your employer (contractor/company) confirming that you work for them. Ask your site supervisor or HR for a letter on company letterhead with your name, job title, and duration of employment. <span class="trust-badge trust-ai">AI-assisted</span></div>
+    </div>
+  </div>
+  <div class="flex flex-between mt-20">
+    <button class="btn btn-outline" onclick="showPage('welfare')">← Back</button>
+    <button class="btn btn-primary" onclick="submitWelfareApp()">Submit Application →</button>
+  </div>
+</div>`;
+}
+
+function showAiAssist() { document.getElementById('aiAssistBox').classList.toggle('hidden'); }
+function simulateUpload(btn) {
+  btn.textContent = '⏳ Uploading...';
+  btn.disabled = true;
+  setTimeout(()=>{ btn.textContent='✅ Uploaded'; btn.style.background='var(--teal)'; btn.style.color='#fff'; },1200);
+}
+function submitWelfareApp() {
+  document.getElementById('workerContent').innerHTML=`<div class="card" style="text-align:center;max-width:480px;margin:60px auto">
+    <div style="font-size:48px;margin-bottom:16px">📋</div>
+    <div style="font-size:18px;font-weight:700;color:var(--teal)">Application Submitted!</div>
+    <div class="text-sm text-muted mt-8">Reference: <strong>APP-${Math.floor(Math.random()*90000+10000)}</strong></div>
+    <div class="alert alert-green mt-16">Your application is under review. You'll be notified of the status within 7 working days.</div>
+    <button class="btn btn-primary btn-block mt-16" onclick="showPage('welfare')">Back to Welfare</button>
+  </div>`;
+}
+
+// ============================================================
+// PAGE: WAGE FAIRNESS
+// ============================================================
+function renderWage() {
+  return `
+<div class="page-header"><div class="page-title">Wage Fairness Analysis</div><div class="page-sub">AI-assisted wage screening · <span class="trust-badge trust-demo">Demo Data</span> · <span class="trust-badge trust-ai">AI-assisted</span></div></div>
+<div class="alert alert-amber">⚠ <strong>Potential Concern Detected.</strong> This is an AI-assisted screening result, not a legal determination. <span class="trust-badge trust-vr">Verification required</span></div>
+<div class="card mt-12">
+  <div class="flex flex-between flex-center mb-16">
+    <div>
+      <div style="font-size:28px;font-weight:800;color:var(--text)">₹500<span style="font-size:16px;color:var(--muted)">/day</span></div>
+      <div class="text-sm text-muted">${workerData.occupation} · ${workerData.experience} years · ${workerData.workingHours} hrs/day</div>
+    </div>
+    <span class="badge badge-amber" style="font-size:14px;padding:8px 16px">🟠 POTENTIAL CONCERN</span>
+  </div>
+  <div class="wage-bar-container">
+    <div class="wage-bar-label"><span>Worker's Reported Wage</span><span style="font-weight:700">₹500/day</span></div>
+    <div class="wage-bar"><div class="wage-bar-fill" style="width:62%;background:var(--amber)">₹500</div></div>
+  </div>
+  <div class="wage-bar-container">
+    <div class="wage-bar-label"><span>Demo Benchmark — Advanced Mason, Gujarat <span class="trust-badge trust-demo">Demo</span></span><span style="font-weight:700">₹620/day</span></div>
+    <div class="wage-bar"><div class="wage-bar-fill" style="width:80%;background:var(--teal)">₹620</div></div>
+  </div>
+  <div class="divider"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card" style="background:var(--amber-light);border-color:#fcd34d">
+      <div style="font-weight:700;color:var(--amber);margin-bottom:4px">⚠ Base Wage Concern</div>
+      <div class="text-sm">Reported wage is <strong>~19% below</strong> the demo benchmark for Advanced Mason in Gujarat.</div>
+    </div>
+    <div class="card" style="background:var(--red-light);border-color:#fca5a5">
+      <div style="font-weight:700;color:var(--red);margin-bottom:4px">🔴 Overtime Hours Concern</div>
+      <div class="text-sm">12 hrs/day exceeds the 8-hour standard. Overtime premium may be applicable.</div>
+    </div>
+  </div>
+</div>
+<div class="card mt-16" style="border-left:4px solid var(--red)">
+  <div class="flex flex-between flex-center mb-12">
+    <div class="section-title" style="margin:0">Exploitation Risk Assessment</div>
+    <span class="risk-high">HIGH</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${[['🕐','12-hour workdays','Exceeds legal standard by 4 hours/day'],
+       ['💰','Wage below demo benchmark','₹120/day below comparable role'],
+       ['⛑','Active safety concern','Unresolved safety report on file']].map(([i,t,d])=>`
+    <div class="flex flex-center gap-10 card" style="padding:10px 12px;background:var(--red-light)">
+      <span>${i}</span><div><div style="font-weight:600;font-size:13px">${t}</div><div class="text-xs text-muted">${d}</div></div>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="alert alert-blue mt-12" style="font-size:13px">
+  ℹ️ <strong>Disclaimer:</strong> This is an AI-assisted screening result based on demo benchmark data, not a legal determination. Workers are encouraged to consult a labor officer for formal guidance. <span class="trust-badge trust-ai">AI-assisted</span>
+</div>
+<div class="flex gap-8 mt-12" style="flex-wrap:wrap">
+  <button class="btn btn-primary" onclick="showWageCalc()">Understand the Calculation</button>
+  <button class="btn btn-outline" onclick="showPage('grievance')">Report a Concern</button>
+</div>
+<div id="wageCalcBox" class="hidden card mt-16" style="background:var(--light)">
+  <div class="section-title">Wage Calculation Explanation <span class="trust-badge trust-ai">AI-assisted</span></div>
+  <div class="text-sm text-muted">The demo benchmark of ₹620/day is derived from construction sector wage data for skilled masons in Gujarat. Your reported wage of ₹500/day is ₹120 (19.4%) below this benchmark. Additionally, working 12 hours per day instead of the standard 8 hours means you may be entitled to overtime pay at 1.5x the hourly rate for the extra 4 hours. This analysis is for screening purposes only.</div>
+</div>`;
+}
+
+function showWageCalc() { document.getElementById('wageCalcBox').classList.toggle('hidden'); }
+
+// ============================================================
+// PAGE: SAFETY
+// ============================================================
+function renderSafety() {
+  return `
+<div class="page-header"><div class="page-title">Safety Reporting</div><div class="page-sub">Report workplace hazards and unsafe conditions</div></div>
+<div class="card-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:20px">
+  <div class="card" style="text-align:center;cursor:pointer" onclick="toggleSafetyMode('voice')">
+    <div style="font-size:32px;margin-bottom:8px">🎙</div>
+    <div style="font-weight:700">Voice Report</div>
+    <div class="text-xs text-muted mt-4">Speak to report</div>
+  </div>
+  <div class="card" style="text-align:center;cursor:pointer;border-color:var(--primary)" onclick="toggleSafetyMode('text')">
+    <div style="font-size:32px;margin-bottom:8px">✍</div>
+    <div style="font-weight:700">Text Report</div>
+    <div class="text-xs text-muted mt-4">Type your report</div>
+  </div>
+  <div class="card" style="text-align:center;cursor:pointer" onclick="toggleSafetyMode('photo')">
+    <div style="font-size:32px;margin-bottom:8px">📷</div>
+    <div style="font-weight:700">Upload Photo</div>
+    <div class="text-xs text-muted mt-4">Photo evidence</div>
+  </div>
+  <div class="card" style="text-align:center;cursor:pointer" onclick="toggleSafetyMode('video')">
+    <div style="font-size:32px;margin-bottom:8px">🎥</div>
+    <div style="font-weight:700">Upload Video</div>
+    <div class="text-xs text-muted mt-4">Video evidence</div>
+  </div>
+</div>
+<div id="safetyTextArea" class="card">
+  <div class="section-title">Describe the Safety Concern</div>
+  <textarea class="form-control" id="safetyText" rows="4" placeholder="e.g. I am working at height without a helmet. The scaffolding has no safety net."></textarea>
+  <button class="btn btn-primary mt-12" onclick="analyzeSafety()">🤖 AI Analyze & Extract</button>
+  <div id="safetyAnalysis"></div>
+</div>
+<div id="safetyVoiceArea" class="card hidden">
+  <div class="section-title">Voice Report</div>
+  <button class="btn btn-red btn-block" id="voiceSafetyBtn" onclick="startSafetyVoice()">🎙 Start Recording</button>
+  <div id="voiceSafetyOutput"></div>
+</div>
+<div id="safetyPhotoArea" class="card hidden">
+  <div class="section-title">Upload Photo Evidence</div>
+  <div style="border:2px dashed var(--border);border-radius:8px;padding:32px;text-align:center;cursor:pointer" onclick="simulatePhotoAnalysis()">
+    <div style="font-size:32px;margin-bottom:8px">📷</div>
+    <div class="text-sm text-muted">Click to simulate photo upload</div>
+  </div>
+  <div id="photoAnalysis"></div>
+</div>
+<div id="safetyVideoArea" class="card hidden">
+  <div class="section-title">Upload Video Evidence</div>
+  <div style="border:2px dashed var(--border);border-radius:8px;padding:32px;text-align:center">
+    <div style="font-size:32px;margin-bottom:8px">🎥</div>
+    <div class="text-sm text-muted">Video upload simulation — file processing would occur here</div>
+    <button class="btn btn-outline mt-12" onclick="simulateVideoUpload()">Simulate Upload</button>
+  </div>
+  <div id="videoUploadMsg"></div>
+</div>`;
+}
+
+function toggleSafetyMode(mode) {
+  ['text','voice','photo','video'].forEach(m=>{
+    const el = document.getElementById('safety'+m.charAt(0).toUpperCase()+m.slice(1)+'Area');
+    if(el) el.classList.toggle('hidden', m!==mode);
+  });
+}
+
+function analyzeSafety() {
+  const text = document.getElementById('safetyText').value;
+  const out = document.getElementById('safetyAnalysis');
+  if(!text.trim()){ out.innerHTML='<div class="alert alert-amber mt-8">Please describe the safety concern.</div>'; return; }
+  out.innerHTML='<div class="alert alert-blue mt-8">⚙ Analyzing... <span class="trust-badge trust-ai">AI-assisted</span></div>';
+  setTimeout(()=>{
+    out.innerHTML=`
+    <div class="card mt-12" style="background:var(--red-light);border-color:#fca5a5">
+      <div class="flex flex-between flex-center mb-10"><div class="section-title" style="margin:0;color:var(--red)">🔴 AI Extracted Report</div><span class="trust-badge trust-ai">AI-assisted</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${[['Hazard','Missing PPE / No Helmet'],['Activity','Working at Height'],['Severity','High'],['Location','Construction Site, Surat']].map(([k,v])=>`<div><div class="text-xs text-muted">${k}</div><div style="font-weight:600;font-size:14px">${v}</div></div>`).join('')}
+      </div>
+      <div class="alert alert-amber mt-12" style="font-size:12px">⚠ Advisory — AI extraction is a screening tool. Human officer review is required before formal action.</div>
+    </div>
+    <button class="btn btn-red btn-block mt-12" onclick="submitSafetyReport()">🚨 Submit Safety Report</button>`;
+  },1500);
+}
+
+function startSafetyVoice() {
+  const btn = document.getElementById('voiceSafetyBtn');
+  const out = document.getElementById('voiceSafetyOutput');
+  btn.textContent = '🔴 Recording...';
+  btn.disabled = true;
+  setTimeout(()=>{
+    out.innerHTML = `<div class="alert alert-green mt-8">✅ Voice recorded. Transcription: "The scaffolding on floor 3 has broken planks. Workers are at risk of falling."</div>
+    <button class="btn btn-red btn-block mt-8" onclick="submitSafetyReport()">🚨 Submit Report</button>`;
+    btn.textContent='▶ Record Again'; btn.disabled=false;
+  },2500);
+}
+
+function simulatePhotoAnalysis() {
+  const out = document.getElementById('photoAnalysis');
+  out.innerHTML='<div class="alert alert-blue mt-8">⚙ Analyzing image... <span class="trust-badge trust-ai">AI-assisted</span></div>';
+  setTimeout(()=>{
+    out.innerHTML=`<div class="card mt-12" style="background:var(--red-light)">
+      <div style="font-weight:700;color:var(--red);margin-bottom:8px">🔴 AI Image Analysis</div>
+      <div class="text-sm">Missing helmet detected · Confidence: 92%</div>
+      <div class="text-xs text-muted mt-4">No visible fall protection equipment detected · Potential safety violation</div>
+      <div class="alert alert-amber mt-8" style="font-size:12px">⚠ Advisory — human verification required before formal action. <span class="trust-badge trust-ai">AI-assisted</span></div>
+    </div>
+    <button class="btn btn-red btn-block mt-8" onclick="submitSafetyReport()">🚨 Submit Report</button>`;
+  },2000);
+}
+
+function simulateVideoUpload() {
+  const out = document.getElementById('videoUploadMsg');
+  out.innerHTML='<div class="alert alert-blue mt-8">⏳ Processing video...</div>';
+  setTimeout(()=>{ out.innerHTML='<div class="alert alert-green mt-8">✅ Video uploaded successfully. Reference: VID-'+Math.floor(Math.random()*90000+10000)+'</div>'; },2000);
+}
+
+function submitSafetyReport() {
+  const caseId = 'GJ-SRT-'+Math.floor(Math.random()*90000+10000);
+  document.getElementById('workerContent').innerHTML=`<div class="card" style="text-align:center;max-width:480px;margin:60px auto">
+    <div style="font-size:48px;margin-bottom:16px">🚨</div>
+    <div style="font-size:18px;font-weight:700;color:var(--red)">Safety Report Submitted</div>
+    <div class="text-sm text-muted mt-8">Case ID: <strong>${caseId}</strong></div>
+    <div class="alert alert-amber mt-16">Priority: <strong>HIGH</strong> · A labor officer will review within 24 hours.</div>
+    <button class="btn btn-primary btn-block mt-16" onclick="showPage('grievance')">Track Your Case →</button>
+  </div>`;
+}
+
+// ============================================================
+// PAGE: GRIEVANCE
+// ============================================================
+function renderGrievance() {
+  return `
+<div class="page-header"><div class="page-title">Grievance Tracking</div><div class="page-sub">Monitor your active cases</div></div>
+<div class="card" style="border-left:4px solid var(--red)">
+  <div class="flex flex-between flex-center mb-12">
+    <div>
+      <div style="font-weight:700;font-size:16px">Case #${workerData.caseId}</div>
+      <div class="text-sm text-muted">Submitted 5 days ago · Surat, Gujarat</div>
+    </div>
+    <div style="text-align:right">
+      <div class="risk-high">HIGH PRIORITY</div>
+      <div class="badge badge-amber mt-8">Under Investigation</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    ${[['Category','Safety Violation'],['Type','Missing PPE / Working at Height'],['Assigned Officer','LO-Surat-07'],['Last Updated','2 days ago']].map(([k,v])=>`<div><div class="text-xs text-muted">${k}</div><div style="font-weight:600;font-size:14px">${v}</div></div>`).join('')}
+  </div>
+  <div class="divider"></div>
+  <div class="section-title">Case Timeline</div>
+  <div class="timeline">
+    ${[['done','Submitted','Your report was received by the system.','5 days ago'],
+       ['done','Assigned','Case assigned to Labor Officer LO-Surat-07.','4 days ago'],
+       ['active','Investigation','Officer has initiated employer inquiry.','2 days ago'],
+       ['pending','Action','Corrective action to be taken by employer.','Pending'],
+       ['pending','Resolved','Case closure upon verification.','Pending'],
+       ['pending','Worker Confirmation','You confirm issue is resolved.','Pending']].map(([s,t,d,time])=>`
+    <div class="tl-item">
+      <div class="tl-dot ${s}">${s==='done'?'✓':s==='active'?'●':'○'}</div>
+      <div class="tl-title">${t}</div>
+      <div class="tl-sub">${d}</div>
+      <div class="text-xs text-muted">${time}</div>
+    </div>`).join('')}
+  </div>
+  <div class="divider"></div>
+  <div class="section-title">Evidence Attached</div>
+  <div class="flex gap-8" style="flex-wrap:wrap">
+    ${[['📷','photo_site_001.jpg'],['📄','safety_report_text.txt']].map(([i,n])=>`<div class="card" style="padding:8px 12px;font-size:13px">${i} ${n}</div>`).join('')}
+  </div>
+  <div class="divider"></div>
+  <div class="card" style="background:var(--light)">
+    <div class="text-xs text-muted mb-4">Officer Notes (read-only)</div>
+    <div class="text-sm">Employer has been contacted. Site inspection scheduled for ${new Date(Date.now()+3*86400000).toLocaleDateString('en-IN')}. Worker is advised to maintain records of hours worked.</div>
+  </div>
+  <div class="mt-16">
+    <button class="btn btn-teal" onclick="markResolved()">✅ Issue Resolved — Close Case</button>
+  </div>
+</div>`;
+}
+
+function markResolved() {
+  document.getElementById('workerContent').innerHTML=`<div class="card" style="text-align:center;max-width:480px;margin:60px auto">
+    <div style="font-size:48px;margin-bottom:16px">✅</div>
+    <div style="font-size:18px;font-weight:700;color:var(--teal)">Thank you for your feedback!</div>
+    <div class="text-sm text-muted mt-8">Case #${workerData.caseId} marked as resolved by worker.</div>
+    <div class="alert alert-green mt-16">The case will be formally closed after officer review.</div>
+    <button class="btn btn-primary btn-block mt-16" onclick="showPage('dashboard')">Back to Dashboard</button>
+  </div>`;
+}
+
+// ============================================================
+// PAGE: JOBS
+// ============================================================
+function renderJobs() {
+  return `
+<div class="page-header"><div class="page-title">Job Matches</div><div class="page-sub">Skill-based recommendations · <span class="trust-badge trust-demo">Demo Data</span> · <span class="trust-badge trust-ai">AI-assisted</span></div></div>
+<div class="card-grid">
+  ${jobs.map(j=>`
+  <div class="card job-card" id="job-${j.id}">
+    <div class="flex flex-between flex-center mb-8">
+      <div style="font-weight:700;font-size:15px">${j.title}</div>
+      <span class="match-badge">${j.match}% match</span>
+    </div>
+    <div class="text-sm text-muted mb-4">🏢 ${j.company}</div>
+    <div class="text-sm text-muted mb-8">📍 ${j.location} · ₹${j.wage}/day</div>
+    <div class="flex gap-8 flex-wrap mb-12">
+      ${j.skills.map(s=>`<span class="badge ${workerData.skills.includes(s)?'badge-teal':'badge-gray'}">${workerData.skills.includes(s)?'✓':''} ${s}</span>`).join('')}
+    </div>
+    <div class="flex flex-between flex-center">
+      <div class="text-xs text-muted">${j.posted}</div>
+      <button class="btn btn-primary btn-sm" onclick="expressInterest('${j.id}','${j.title}')">Express Interest</button>
+    </div>
+    <div id="interest-${j.id}"></div>
+  </div>`).join('')}
+</div>`;
+}
+
+function expressInterest(id,title) {
+  document.getElementById('interest-'+id).innerHTML=`<div class="alert alert-green mt-8" style="font-size:12px">✅ Interest registered for <strong>${title}</strong>. Employer will be notified.</div>`;
+}
+
+// ============================================================
+// PAGE: TRAINING
+// ============================================================
+function renderTraining() {
+  return `
+<div class="page-header"><div class="page-title">Skill Gap & Training</div><div class="page-sub">Advance your career · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="card mt-0" style="background:linear-gradient(90deg,var(--primary-bg),#e0eaff);margin-bottom:20px">
+  <div class="section-title">Career Progression Path <span class="trust-badge trust-ai">AI-suggested</span></div>
+  <div class="flex flex-center gap-12" style="flex-wrap:wrap">
+    <div class="orch-node done-node">Advanced Mason</div>
+    <div class="orch-arrow">→</div>
+    <div class="orch-node" style="border-style:dashed">Site Supervisor</div>
+    <div class="orch-arrow">→</div>
+    <div class="orch-node" style="border-style:dashed;opacity:.5">Project Manager</div>
+  </div>
+</div>
+<div class="card mb-16">
+  <div class="section-title">Skill Gaps to Bridge</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    ${[['Site Management','Required for Supervisor role'],['Safety Certification','BOCW and NSDC requirement'],['Digital Documentation','Project reporting skills'],['Team Leadership','Manage a crew of 5-10 workers']].map(([g,r])=>`<div class="card" style="padding:8px 12px;border-left:3px solid var(--amber)"><div style="font-size:13px;font-weight:600">${g}</div><div class="text-xs text-muted">${r}</div></div>`).join('')}
+  </div>
+</div>
+<div class="section-title">Recommended Training</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+  ${trainings.map((t,i)=>`
+  <div class="training-card card" id="train-${t.id}">
+    <div class="flex flex-between flex-center mb-8">
+      <div style="font-weight:700">${t.title}</div>
+      <span class="badge badge-purple">${t.status}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+      <div><div class="text-xs text-muted">Duration</div><div style="font-weight:600;font-size:13px">${t.duration}</div></div>
+      <div><div class="text-xs text-muted">Provider</div><div style="font-weight:600;font-size:13px">${t.provider}</div></div>
+      <div><div class="text-xs text-muted">Location</div><div style="font-weight:600;font-size:13px">${t.location}</div></div>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-primary btn-sm" onclick="enrollTraining('${t.id}')">Enroll Now</button>
+      <button class="btn btn-outline btn-sm">View Details</button>
+    </div>
+    <div id="enroll-${t.id}"></div>
+  </div>`).join('')}
+</div>`;
+}
+
+function enrollTraining(id) {
+  document.getElementById('enroll-'+id).innerHTML=`<div class="alert alert-green mt-8" style="font-size:12px">✅ Enrolled! You'll receive confirmation and schedule details via SMS.</div>`;
+}
+
+// ============================================================
+// PAGE: NOTIFICATIONS
+// ============================================================
+function renderNotifications() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">Notifications</div></div>
+  <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark all read</button>
+</div>
+<div class="card">
+  <div id="notifList">
+    ${notifications.map(n=>`
+    <div class="notification-item ${n.read?'notif-read':'notif-unread'}" id="notif-${n.id}">
+      <div class="notif-icon" style="background:var(--primary-bg)">${n.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:${n.read?'400':'700'};font-size:14px">${n.title} ${!n.read?'<span class="badge badge-blue" style="font-size:10px">New</span>':''}</div>
+        <div class="text-sm text-muted mt-4">${n.msg}</div>
+        <div class="text-xs text-muted mt-4">${n.time}</div>
+      </div>
+      ${!n.read?`<button class="btn btn-ghost btn-sm" onclick="markNotifRead('${n.id}')">✓</button>`:''}
+    </div>`).join('')}
+  </div>
+</div>`;
+}
+
+function markAllRead() { notifications.forEach(n=>n.read=true); renderPage('notifications'); }
+function markNotifRead(id) { const n=notifications.find(x=>x.id===id); if(n)n.read=true; renderPage('notifications'); }
+
+// ============================================================
+// PAGE: AI CHAT
+// ============================================================
+function renderChat() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">🤖 Sahaay AI</div><div class="page-sub">Your multilingual labor welfare assistant</div></div>
+  <select class="form-control" style="width:auto">
+    <option>🇬🇧 English</option>
+    <option>🇮🇳 Hindi</option>
+    <option>🇮🇳 Gujarati</option>
+  </select>
+</div>
+<div class="card" style="height:calc(100vh - 240px);min-height:450px;display:flex;flex-direction:column">
+  <div class="quick-chips" style="border-top:none;border-bottom:1px solid var(--border)">
+    ${['What benefits can I get?','Is my wage fair?','Report unsafe workplace','Find jobs for me','Explain my rights'].map(q=>`<div class="chip" onclick="sendChatMessage(this,'${q}')">${q}</div>`).join('')}
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-bubble ai">
+      <div style="font-weight:700;margin-bottom:4px">🤖 Sahaay AI</div>
+      Namaste, ${workerData.name}! I'm here to help with your welfare, wages, and workplace rights. What would you like to know today?
+      <div class="text-xs text-muted mt-8"><span class="trust-badge trust-ai">AI-assisted</span> Responses are advisory, not legal advice.</div>
+    </div>
+  </div>
+  <div id="agentPanelContainer"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" rows="1" placeholder="Type your message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatFromInput();}"></textarea>
+    <button class="btn btn-primary" onclick="sendChatFromInput()">Send</button>
+  </div>
+</div>`;
+}
+
+function initChat() { chatHistory = []; }
+
+function sendChatFromInput() {
+  const inp = document.getElementById('chatInput');
+  if(!inp) return;
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  sendChatMessage(null, msg);
+}
+
+function sendChatMessage(el, msg) {
+  const messages = document.getElementById('chatMessages');
+  if(!messages) return;
+  messages.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+  messages.scrollTop = messages.scrollHeight;
+  showAgentActivity(msg);
+}
+
+function showAgentActivity(query) {
+  const container = document.getElementById('agentPanelContainer');
+  if(!container) return;
+  const agents = [
+    {name:'Master Orchestrator',desc:'Routing query to specialized agents...'},
+    {name:'Worker Profile Agent',desc:'Loading Ramesh Kumar\'s profile...'},
+    {name:'Skill Mapping Agent',desc:'Analyzing skill relevance...'},
+    {name:'Welfare Eligibility Agent',desc:'Checking scheme eligibility...'},
+    {name:'Wage Fairness Agent',desc:'Comparing wage benchmarks...'},
+  ];
+  container.innerHTML = `<div class="agent-panel" id="liveAgentPanel">
+    <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">⚙ AGENTIC PROCESSING <span class="trust-badge trust-ai">AI-assisted</span></div>
+    ${agents.map((a,i)=>`<div class="agent-row" id="agrow-${i}">
+      <div class="agent-status pending" id="agst-${i}">○</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${a.name}</div><div class="text-xs text-muted" id="agdesc-${i}">${a.desc}</div></div>
+      <div class="text-xs text-muted" id="agconf-${i}">—</div>
+    </div>`).join('')}
+  </div>`;
+  let i = 0;
+  function animateNext() {
+    if(i >= agents.length) { buildChatResponse(query); return; }
+    const st = document.getElementById('agst-'+i);
+    const desc = document.getElementById('agdesc-'+i);
+    const conf = document.getElementById('agconf-'+i);
+    if(st){ st.className='agent-status running'; st.textContent='●'; }
+    setTimeout(()=>{
+      if(st){ st.className='agent-status done'; st.textContent='✓'; }
+      if(conf) conf.textContent = (75+Math.floor(Math.random()*20))+'%';
+      i++;
+      animateNext();
+    }, 500);
+  }
+  animateNext();
+}
+
+function buildChatResponse(query) {
+  const messages = document.getElementById('chatMessages');
+  const container = document.getElementById('agentPanelContainer');
+  if(container) container.innerHTML = '';
+  const lq = query.toLowerCase();
+  let response = '';
+  if(lq.includes('wage') || lq.includes('salary') || lq.includes('fair')) {
+    response = `<div style="font-weight:700;margin-bottom:8px">💰 Wage Fairness Analysis</div>
+    <div style="background:var(--amber-light);border-radius:8px;padding:10px;margin-bottom:8px">
+      <div style="font-weight:700;color:var(--amber)">🟠 POTENTIAL CONCERN DETECTED</div>
+      <div class="text-sm mt-4">Your reported wage: <strong>₹500/day</strong><br>Demo benchmark for Advanced Mason: <strong>₹620/day</strong><br>Gap: <strong>~19% below benchmark</strong> (demo data)</div>
+    </div>
+    <div class="text-sm">Additionally, your 12-hour workday exceeds the 8-hour standard. You may be entitled to overtime pay.</div>
+    <div class="text-xs text-muted mt-8">⚠ This is an AI-assisted screening result, not a legal determination. <span class="trust-badge trust-ai">AI-assisted</span></div>
+    <button class="btn btn-amber btn-sm mt-8" onclick="showPage('wage')">View Full Analysis →</button>`;
+  } else if(lq.includes('benefit') || lq.includes('scheme') || lq.includes('welfare')) {
+    response = `<div style="font-weight:700;margin-bottom:8px">🛡 Your Welfare Benefits</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${schemes.slice(0,3).map(s=>`<div style="display:flex;align-items:center;gap:8px;font-size:13px">${s.dot} <strong>${s.name}</strong> — ${s.statusLabel}</div>`).join('')}
+    </div>
+    <div class="text-xs text-muted mt-8 trust-badge trust-ai">AI-matched to your profile</div>
+    <button class="btn btn-teal btn-sm mt-8" onclick="showPage('welfare')">View All Schemes →</button>`;
+  } else if(lq.includes('safety') || lq.includes('unsafe') || lq.includes('accident')) {
+    response = `<div style="font-weight:700;margin-bottom:8px">⛑ Workplace Safety</div>
+    <div class="text-sm">I can help you report unsafe conditions immediately. You have the right to a safe workplace under the Building and Other Construction Workers Act, 1996.</div>
+    <button class="btn btn-red btn-sm mt-8" onclick="showPage('safety')">Report Safety Issue →</button>`;
+  } else if(lq.includes('job') || lq.includes('work')) {
+    response = `<div style="font-weight:700;margin-bottom:8px">💼 Job Matches for You</div>
+    <div class="text-sm">Based on your skills (Mason, Plastering, Concrete Work), I found <strong>${jobs.length} job matches</strong> in Gujarat.</div>
+    <button class="btn btn-primary btn-sm mt-8" onclick="showPage('jobs')">View Job Matches →</button>`;
+  } else if(lq.includes('right')) {
+    response = `<div style="font-weight:700;margin-bottom:8px">⚖ Your Rights as a Worker</div>
+    <ul style="font-size:13px;margin-left:16px;margin-top:8px;line-height:2">
+      <li>Right to minimum wages under state notification</li>
+      <li>Right to safe working conditions (BOCW Act 1996)</li>
+      <li>Right to overtime pay for hours beyond 8/day</li>
+      <li>Right to welfare benefits as a registered worker</li>
+      <li>Right to file a grievance without retaliation</li>
+    </ul>
+    <div class="text-xs text-muted mt-8"><span class="trust-badge trust-ai">AI-assisted</span> Consult a labor officer for legal advice.</div>`;
+  } else {
+    response = `<div style="font-weight:700;margin-bottom:8px">🤖 Sahaay AI Response</div>
+    <div class="text-sm">Thank you for your question. Based on your profile as a mason in Surat with 7 years experience, here's what I can help with:</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+      ${[['🛡 Welfare','5 schemes matched'],['💰 Wages','Potential concern'],['💼 Jobs','8 matches'],['📚 Training','3 courses']].map(([i,v])=>`<div style="background:var(--light);border-radius:8px;padding:8px;font-size:13px"><strong>${i}</strong><br>${v}</div>`).join('')}
+    </div>
+    <div class="text-xs text-muted mt-8"><span class="trust-badge trust-ai">AI-assisted</span> All data is demo data.</div>`;
+  }
+  if(messages) {
+    messages.innerHTML += `<div class="chat-bubble ai">${response}</div>`;
+    messages.scrollTop = messages.scrollHeight;
+  }
+}
+
+// ============================================================
+// PAGE: ORCHESTRATOR
+// ============================================================
+function renderOrchestrator() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">AI Architecture — Master Orchestrator</div><div class="page-sub">How Sahaay AI processes your queries</div></div>
+  <button class="btn btn-primary" onclick="runOrchestratorDemo()">▶ See AI in Action</button>
+</div>
+<div class="card mb-16">
+  <div class="orchestrator-diagram" id="orchDiagram">
+    <div class="orch-node" id="on-ui" style="background:var(--primary-bg);border-color:var(--primary);color:var(--primary)">🤖 Sahaay AI (User Interface)</div>
+    <div class="orch-arrow">↓</div>
+    <div class="orch-node" id="on-orch">⚙ Master Orchestrator</div>
+    <div class="orch-arrow">↓</div>
+    <div class="orch-row">
+      ${[['on-profile','👤 Profile'],['on-skill','🔧 Skill'],['on-welfare','🛡 Welfare'],['on-wage','💰 Wage'],['on-safety','⛑ Safety'],['on-jobs','💼 Jobs'],['on-training','📚 Training'],['on-notif','🔔 Notify']].map(([id,n])=>`<div class="orch-agent" id="${id}">${n}</div>`).join('')}
+    </div>
+    <div class="orch-arrow">↓</div>
+    <div class="orch-node" id="on-risk">🔍 Risk Analysis Engine</div>
+    <div class="orch-arrow">↓</div>
+    <div class="orch-node" id="on-officer">👨‍💼 Human Officer Review</div>
+    <div class="orch-arrow">↓</div>
+    <div class="orch-node" id="on-followup">✅ Worker Follow-up</div>
+  </div>
+  <div class="divider"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+    ${[['⚙ Master Orchestrator','Routes queries to appropriate specialist agents and aggregates results'],
+       ['👤 Profile Agent','Fetches and contextualizes worker registration data'],
+       ['🔧 Skill Mapping Agent','Maps free-text descriptions to structured skill taxonomy'],
+       ['🛡 Welfare Agent','Matches worker profile to eligible government schemes'],
+       ['💰 Wage Fairness Agent','Compares wages to demo benchmarks and flags concerns'],
+       ['⛑ Safety Agent','Classifies safety reports and determines severity level'],
+       ['💼 Jobs Agent','Matches worker skills to available job openings'],
+       ['🔍 Risk Analysis Engine','Aggregates signals to compute composite risk score']].map(([n,d])=>`
+    <div class="card" style="padding:12px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${n}</div>
+      <div class="text-xs text-muted">${d}</div>
+    </div>`).join('')}
+  </div>
+</div>
+<div id="demoResult" class="hidden">
+  <div class="card" style="border-left:4px solid var(--primary)">
+    <div class="section-title">Demo Assessment — Ramesh Kumar <span class="trust-badge trust-demo">Demo Data</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="demoResultGrid"></div>
+    <div id="demoCreateCase" class="hidden mt-16">
+      <button class="btn btn-primary btn-block" onclick="createDemoCase()">Create Officer Review Case</button>
+    </div>
+  </div>
+</div>`;
+}
+
+let orchDemoRunning = false;
+function runOrchestratorDemo() {
+  if(orchDemoRunning) return;
+  orchDemoRunning = true;
+  const nodes = ['on-orch','on-profile','on-skill','on-welfare','on-wage','on-safety','on-jobs','on-training','on-notif','on-risk','on-officer','on-followup'];
+  const agents = ['on-profile','on-skill','on-welfare','on-wage','on-safety','on-jobs','on-training','on-notif'];
+  let i = 0;
+  function next() {
+    if(i>0) {
+      const prev = nodes[i-1];
+      const el = document.getElementById(prev);
+      if(el) el.className = el.className.includes('orch-agent')?'orch-agent done-node':'orch-node done-node';
+    }
+    if(i >= nodes.length) {
+      orchDemoRunning = false;
+      showDemoResult();
+      return;
+    }
+    const cur = nodes[i];
+    const el = document.getElementById(cur);
+    if(el) el.className = el.className.includes('orch-agent')?'orch-agent active-node':'orch-node active-node';
+    if(cur==='on-risk') { const el2=document.getElementById(cur); if(el2) el2.className='orch-node risk-node'; }
+    i++;
+    setTimeout(next, 450);
+  }
+  // Reset all
+  nodes.forEach(id=>{ const el=document.getElementById(id); if(el){ el.className=el.className.includes('orch-agent')?'orch-agent':'orch-node'; }});
+  next();
+}
+
+function showDemoResult() {
+  const dr = document.getElementById('demoResult');
+  const grid = document.getElementById('demoResultGrid');
+  if(!dr||!grid) return;
+  dr.classList.remove('hidden');
+  const results = [
+    {k:'🔧 Skill Assessment',v:'Advanced Mason · 7 years',status:'✓ Confirmed',col:'teal'},
+    {k:'🛡 Welfare Matches',v:'5 potential schemes',status:'✓ Matched',col:'teal'},
+    {k:'💰 Wage Analysis',v:'₹500/day vs ₹620 benchmark',status:'⚠ Concern',col:'amber'},
+    {k:'⛑ Safety Status',v:'Active concern — missing PPE',status:'🔴 High Priority',col:'red'},
+    {k:'📊 Overall Risk',v:'HIGH — Multiple signals',status:'👨‍💼 Human Review Recommended',col:'red'},
+  ];
+  grid.innerHTML = results.map(r=>`
+    <div class="card" style="padding:12px;border-left:3px solid var(--${r.col})">
+      <div style="font-size:12px;font-weight:700;color:var(--muted)">${r.k}</div>
+      <div style="font-weight:600;margin:4px 0">${r.v}</div>
+      <div style="font-size:13px;color:var(--${r.col})">${r.status}</div>
+    </div>`).join('');
+  document.getElementById('demoCreateCase').classList.remove('hidden');
+}
+
+function createDemoCase() {
+  demoCaseCreated = true;
+  const btn = document.querySelector('#demoCreateCase button');
+  if(btn) btn.textContent = '✅ Case GJ-SRT-DEMO-001 Created — Government Dashboard Updated';
+  setTimeout(()=>{
+    document.getElementById('workerContent').innerHTML=`<div class="card" style="text-align:center;max-width:480px;margin:60px auto">
+      <div style="font-size:48px;margin-bottom:16px">📋</div>
+      <div style="font-size:18px;font-weight:700;color:var(--primary)">Case GJ-SRT-DEMO-001 Created</div>
+      <div class="text-sm text-muted mt-8">A government officer has been notified and will review Ramesh Kumar's case.</div>
+      <div class="alert alert-amber mt-16">Priority: HIGH · Safety + Wage concerns · Human review required</div>
+      <div class="flex gap-8 mt-16">
+        <button class="btn btn-primary btn-block" onclick="switchRole('govt');document.getElementById('roleSelect').value='govt'">View in Government Dashboard →</button>
+      </div>
+    </div>`;
+  },1500);
+}
+
+// ============================================================
+// NGO PAGES
+// ============================================================
+function renderNgoOverview() {
+  return `
+<div class="page-header"><div class="page-title">NGO Field Officer Dashboard</div><div class="page-sub">Assigned workers in Surat district · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="stat-grid">
+  ${[['47','Assigned Workers'],['3','New Registrations'],['8','Pending Verification'],['5','High-Risk Cases']].map(([n,l])=>`<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('')}
+</div>
+<div class="card mt-16">
+  <div class="section-title">Priority Actions</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${[['🔴 HIGH','Ramesh Kumar — Wage + Safety concern. Requires field visit.','Visit'],
+       ['🟠 MED','Meena Devi — Welfare application incomplete.','Follow up'],
+       ['🔵 INFO','3 new registrations awaiting verification.','Verify']].map(([p,d,a])=>`
+    <div class="flex flex-center gap-12 card" style="padding:10px 14px">
+      <span style="font-size:12px;font-weight:700;min-width:60px">${p}</span>
+      <div style="flex:1;font-size:13px">${d}</div>
+      <button class="btn btn-outline btn-sm" onclick="showNgoPage('ngo-workers')">${a}</button>
+    </div>`).join('')}
+  </div>
+</div>
+<div class="card mt-16">
+  <div class="section-title">Today's Field Schedule</div>
+  <div class="text-sm text-muted">3 site visits scheduled · 2 application assists · 1 employer meeting</div>
+  <div class="flex gap-8 mt-12">
+    <button class="btn btn-primary btn-sm" onclick="showNgoPage('ngo-workers')">View Worker List</button>
+    <button class="btn btn-outline btn-sm" onclick="showNgoPage('ngo-cases')">View Cases</button>
+  </div>
+</div>`;
+}
+
+function renderNgoWorkers() {
+  return `
+<div class="page-header flex flex-between flex-center">
+  <div><div class="page-title">Workers</div></div>
+  <div class="flex gap-8">
+    <select class="form-control" style="width:auto"><option>All Districts</option><option>Surat</option><option>Ahmedabad</option><option>Vadodara</option></select>
+    <select class="form-control" style="width:auto"><option>All Industries</option><option>Construction</option><option>Textile</option><option>Diamond</option></select>
+    <select class="form-control" style="width:auto"><option>All Risk Levels</option><option>High</option><option>Medium</option><option>Low</option></select>
+  </div>
+</div>
+<div class="card">
+  <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>Name</th><th>State</th><th>Industry</th><th>Location</th><th>Skill</th><th>Welfare</th><th>Risk</th><th>Case</th><th>Actions</th></tr></thead>
+      <tbody>
+        ${workers.map(w=>`<tr>
+          <td style="font-family:monospace;font-size:12px">${w.id}</td>
+          <td style="font-weight:600">${w.name}</td>
+          <td>${w.state}</td><td>${w.industry}</td><td>${w.location}</td><td>${w.skill}</td>
+          <td><span class="badge ${w.welfare==='Matched'?'badge-teal':w.welfare==='Applied'?'badge-blue':'badge-amber'}">${w.welfare}</span></td>
+          <td><span class="${w.risk==='HIGH'?'risk-high':w.risk==='MEDIUM'?'risk-medium':'risk-low'}">${w.risk}</span></td>
+          <td><span class="badge ${w.case==='Active'?'badge-red':w.case==='Open'?'badge-amber':'badge-gray'}">${w.case}</span></td>
+          <td><div class="flex gap-8">
+            <button class="btn btn-outline btn-sm" onclick="showNgoWorkerDetail('${w.id}')">View</button>
+            <button class="btn btn-primary btn-sm" onclick="alert('Note added for '+${JSON.stringify(w.name)})">Note</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="ngoWorkerDetail"></div>`;
+}
+
+function showNgoWorkerDetail(id) {
+  const w = workers.find(x=>x.id===id);
+  if(!w) return;
+  document.getElementById('ngoWorkerDetail').innerHTML=`
+  <div class="card mt-16" style="border-left:4px solid var(--primary)">
+    <div class="flex flex-between flex-center mb-12">
+      <div style="font-weight:700;font-size:16px">${w.name} — ${w.id}</div>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ngoWorkerDetail').innerHTML=''">✕ Close</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      ${[['Industry',w.industry],['Location',w.location],['Skill',w.skill],['Welfare Status',w.welfare],['Risk Level',w.risk],['Case Status',w.case]].map(([k,v])=>`<div><div class="text-xs text-muted">${k}</div><div style="font-weight:600">${v}</div></div>`).join('')}
+    </div>
+    <div class="flex gap-8 mt-12">
+      <button class="btn btn-teal btn-sm" onclick="alert('Profile verified for '+${JSON.stringify(w.name)})">✅ Verify Profile</button>
+      <button class="btn btn-outline btn-sm" onclick="alert('Grievance created for '+${JSON.stringify(w.name)})">📋 Create Grievance</button>
+      <button class="btn btn-primary btn-sm">📞 Contact Worker</button>
+    </div>
+  </div>`;
+}
+
+function renderNgoWelfare() {
+  return `
+<div class="page-header"><div class="page-title">Welfare Applications</div></div>
+<div class="alert alert-amber">8 workers have incomplete applications requiring field assistance.</div>
+<div class="card mt-16"><div class="section-title">Pending Assistance</div>
+  <table class="data-table"><thead><tr><th>Worker</th><th>Scheme</th><th>Missing Document</th><th>Action</th></tr></thead>
+  <tbody>
+    ${[['Ramesh Kumar','BOCW Health','Employer Certificate'],['Meena Devi','PM Jan Arogya','Aadhaar Linkage'],['Sita Das','PM Awas Yojana','Address Proof'],['Abdul Rahman','BOCW Education','Child Enrollment Proof']].map(([n,s,m])=>`<tr><td style="font-weight:600">${n}</td><td>${s}</td><td><span class="badge badge-amber">${m}</span></td><td><button class="btn btn-primary btn-sm">Assist</button></td></tr>`).join('')}
+  </tbody></table>
+</div>`;
+}
+
+function renderNgoCases() {
+  return `
+<div class="page-header"><div class="page-title">Cases</div></div>
+<div class="card">
+  <table class="data-table"><thead><tr><th>Case ID</th><th>Worker</th><th>Type</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+    ${[['GJ-SRT-20481','Ramesh Kumar','Safety','HIGH','Under Investigation'],
+       ['GJ-AMD-10234','Meena Devi','Welfare','MEDIUM','Open'],
+       ...(demoCaseCreated?[['GJ-SRT-DEMO-001','Ramesh Kumar','Wage+Safety','HIGH','Awaiting Review']]:[])]
+      .map(([id,n,t,p,s])=>`<tr>
+        <td style="font-family:monospace;font-size:12px">${id}</td>
+        <td style="font-weight:600">${n}</td><td>${t}</td>
+        <td><span class="${p==='HIGH'?'risk-high':'risk-medium'}">${p}</span></td>
+        <td><span class="badge badge-amber">${s}</span></td>
+        <td><button class="btn btn-primary btn-sm">Review</button></td>
+      </tr>`).join('')}
+  </tbody></table>
+</div>`;
+}
+
+// ============================================================
+// GOVERNMENT PAGES
+// ============================================================
+function renderGovtDashboard() {
+  return `
+<div class="page-header"><div class="page-title">Government Officer Dashboard</div><div class="page-sub">Gujarat State Labor Welfare Portal · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr));margin-bottom:24px">
+  ${[['12,480','Workers Registered','primary'],['8,920','Welfare Matches','teal'],['847','Applications','blue'],['234','Open Grievances','amber'],['42','High-Risk Cases','red'],['1,760','Safety Reports','red']].map(([n,l,c])=>`<div class="stat-card" style="border-top:3px solid var(--${c})"><div class="stat-num" style="color:var(--${c})">${n}</div><div class="stat-label">${l}</div></div>`).join('')}
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+  <div class="card"><div class="section-title">Workers by Industry</div><canvas id="chartIndustry" width="220" height="160"></canvas></div>
+  <div class="card"><div class="section-title">Grievance Status</div><canvas id="chartGrievance" width="220" height="160"></canvas></div>
+  <div class="card"><div class="section-title">Risk Distribution</div><canvas id="chartRisk" width="220" height="160"></canvas></div>
+</div>
+<div class="card">
+  <div class="flex flex-between flex-center mb-12">
+    <div class="section-title" style="margin:0">Recent Escalated Cases</div>
+    <button class="btn btn-outline btn-sm" onclick="showGovtPage('govt-cases')">View All →</button>
+  </div>
+  <table class="data-table"><thead><tr><th>Case ID</th><th>Worker</th><th>Type</th><th>Risk</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody id="govtCaseTableBody">
+    ${getGovtCaseRows()}
+  </tbody></table>
+</div>`;
+}
+
+function getGovtCaseRows() {
+  const rows = [
+    ['GJ-SRT-20481','Ramesh Kumar','Safety','HIGH','Under Investigation'],
+    ['GJ-AMD-10234','Meena Devi','Welfare','MEDIUM','Pending Review'],
+    ['GJ-VDR-08823','Sita Das','Welfare','MEDIUM','Open'],
+    ...(demoCaseCreated?[['GJ-SRT-DEMO-001','Ramesh Kumar','Wage+Safety','HIGH','Awaiting Review']]:[] ),
+  ];
+  return rows.map(([id,n,t,p,s])=>`<tr>
+    <td style="font-family:monospace;font-size:12px;color:var(--primary)">${id}</td>
+    <td style="font-weight:600">${n}</td><td>${t}</td>
+    <td><span class="${p==='HIGH'?'risk-high':'risk-medium'}">${p}</span></td>
+    <td><span class="badge ${s==='Awaiting Review'?'badge-red':s==='Under Investigation'?'badge-amber':'badge-gray'}">${s}</span></td>
+    <td><div class="flex gap-8">
+      <button class="btn btn-primary btn-sm" onclick="reviewCase('${id}')">Review</button>
+      <button class="btn btn-teal btn-sm" onclick="resolveCase('${id}')">Resolve</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function drawGovtCharts() {
+  setTimeout(()=>{
+    drawBar('chartIndustry',['Construction','Textile','Diamond'],[45,32,23],['#1e3a5f','#0d9488','#3b82f6']);
+    drawDonut('chartGrievance',['Open','In Progress','Resolved'],[234,312,1214],['#dc2626','#d97706','#0d9488']);
+    drawDonut('chartRisk',['Critical','High','Medium','Low'],[12,42,187,605],['#dc2626','#f97316','#d97706','#0d9488']);
+  },100);
+}
+
+function drawBar(id,labels,data,colors) {
+  const c = document.getElementById(id); if(!c) return;
+  const ctx = c.getContext('2d');
+  const W=c.width,H=c.height,pad=30,bw=40,max=Math.max(...data);
+  ctx.clearRect(0,0,W,H);
+  labels.forEach((l,i)=>{
+    const x=pad+i*(bw+20), barH=(data[i]/max)*(H-pad-20), y=H-pad-barH;
+    ctx.fillStyle=colors[i]; ctx.fillRect(x,y,bw,barH);
+    ctx.fillStyle='#64748b'; ctx.font='11px system-ui'; ctx.textAlign='center';
+    ctx.fillText(l,x+bw/2,H-8);
+    ctx.fillText(data[i]+'%',x+bw/2,y-4);
+  });
+}
+
+function drawDonut(id,labels,data,colors) {
+  const c=document.getElementById(id); if(!c) return;
+  const ctx=c.getContext('2d'),W=c.width,H=c.height,cx=W/2,cy=H/2-10,r=55,inner=30;
+  const total=data.reduce((a,b)=>a+b,0); let start=-Math.PI/2;
+  ctx.clearRect(0,0,W,H);
+  data.forEach((v,i)=>{
+    const angle=(v/total)*2*Math.PI;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+angle); ctx.closePath();
+    ctx.fillStyle=colors[i]; ctx.fill();
+    start+=angle;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,inner,0,2*Math.PI); ctx.fillStyle='#fff'; ctx.fill();
+  // legend
+  labels.forEach((l,i)=>{ ctx.fillStyle=colors[i]; ctx.fillRect(10,H-55+i*14,10,10); ctx.fillStyle='#64748b'; ctx.font='10px system-ui'; ctx.textAlign='left'; ctx.fillText(l+' ('+data[i]+')',24,H-46+i*14); });
+}
+
+function renderGovtMap() {
+  return `
+<div class="page-header"><div class="page-title">Worker Distribution Map</div><div class="page-sub">Gujarat District Map — <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="map-container card" style="height:480px;position:relative">
+  <svg viewBox="0 0 500 420" style="width:100%;height:380px">
+    <!-- Simplified Gujarat outline polygons -->
+    <polygon points="180,40 230,30 280,50 320,60 360,80 380,120 370,160 350,180 310,200 290,240 260,260 220,270 200,290 170,280 150,260 140,230 130,200 120,170 130,140 140,110 160,80" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+    <!-- District clusters -->
+    <circle cx="290" cy="220" r="28" fill="rgba(220,38,38,.25)" stroke="#dc2626" stroke-width="2"/>
+    <text x="290" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">Surat</text>
+    <text x="290" y="228" text-anchor="middle" font-size="10" fill="#dc2626">4,820 workers</text>
+    <circle cx="210" cy="130" r="22" fill="rgba(30,58,95,.2)" stroke="#1e3a5f" stroke-width="2"/>
+    <text x="210" y="124" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">Ahmedabad</text>
+    <text x="210" y="138" text-anchor="middle" font-size="10" fill="#1e3a5f">3,720 workers</text>
+    <circle cx="250" cy="185" r="18" fill="rgba(13,148,136,.2)" stroke="#0d9488" stroke-width="2"/>
+    <text x="250" y="180" text-anchor="middle" font-size="10" font-weight="700" fill="#1e293b">Vadodara</text>
+    <text x="250" y="193" text-anchor="middle" font-size="9" fill="#0d9488">2,140</text>
+    <circle cx="155" cy="160" r="16" fill="rgba(59,130,246,.2)" stroke="#3b82f6" stroke-width="2"/>
+    <text x="155" y="155" text-anchor="middle" font-size="10" font-weight="700" fill="#1e293b">Rajkot</text>
+    <text x="155" y="168" text-anchor="middle" font-size="9" fill="#3b82f6">1,800</text>
+  </svg>
+  <div class="map-legend">
+    <div style="font-size:11px;font-weight:700;margin-bottom:6px">Worker Density</div>
+    ${[['#dc2626','Surat — HIGH risk cluster'],['#1e3a5f','Ahmedabad'],['#0d9488','Vadodara'],['#3b82f6','Rajkot']].map(([c,l])=>`<div style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:4px"><span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></span>${l}</div>`).join('')}
+    <div style="font-size:10px;color:var(--muted);margin-top:4px"><span class="trust-badge trust-demo">Demo Data</span></div>
+  </div>
+</div>`;
+}
+
+function renderGovtWelfare() {
+  return `
+<div class="page-header"><div class="page-title">Welfare Administration</div><div class="page-sub"><span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="stat-grid mb-16">
+  ${[['8,920','Matches Generated'],['847','Applications Filed'],['412','Disbursed'],['234','Pending'],['201','Rejected']].map(([n,l])=>`<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('')}
+</div>
+<div class="card"><div class="section-title">Scheme-wise Status</div>
+  <table class="data-table"><thead><tr><th>Scheme</th><th>Eligible Workers</th><th>Applied</th><th>Disbursed</th><th>Gap</th></tr></thead>
+  <tbody>
+    ${[['BOCW Health Assistance',3420,1240,890,'<span class="risk-high">2180 not applied</span>'],
+       ['PM Jan Arogya Yojana',2810,890,640,'<span class="risk-medium">1920 pending</span>'],
+       ['PM Awas Yojana',1560,410,210,'<span class="risk-medium">1150 pending</span>'],
+       ['BOCW Education Assistance',890,234,180,'<span class="risk-low">656 not applied</span>']].map(([s,e,a,d,g])=>`<tr><td style="font-weight:600">${s}</td><td>${e.toLocaleString()}</td><td>${a.toLocaleString()}</td><td>${d.toLocaleString()}</td><td>${g}</td></tr>`).join('')}
+  </tbody></table>
+</div>`;
+}
+
+function renderGovtWage() {
+  return `
+<div class="page-header"><div class="page-title">Wage Risk Monitoring</div><div class="page-sub"><span class="trust-badge trust-demo">Demo Data</span> · <span class="trust-badge trust-ai">AI-assisted</span></div></div>
+<div class="alert alert-red">🔴 23 workers flagged for potential wage violations this week across Construction and Textile sectors.</div>
+<div class="card mt-16"><div class="section-title">Flagged Cases</div>
+  <table class="data-table"><thead><tr><th>Worker</th><th>Industry</th><th>Location</th><th>Reported Wage</th><th>Benchmark</th><th>Gap</th><th>Risk</th></tr></thead>
+  <tbody>
+    ${[['Ramesh Kumar','Construction','Surat','₹500','₹620','19%','HIGH'],
+       ['Sita Das','Construction','Vadodara','₹350','₹450','22%','HIGH'],
+       ['Meena Devi','Textile','Ahmedabad','₹380','₹460','17%','MEDIUM'],
+       ['Worker W-089','Textile','Ahmedabad','₹360','₹460','22%','HIGH']].map(([n,i,l,w,b,g,r])=>`<tr><td style="font-weight:600">${n}</td><td>${i}</td><td>${l}</td><td style="font-weight:700">${w}</td><td>${b}</td><td><span class="${r==='HIGH'?'risk-high':'risk-medium'}">${g}</span></td><td><span class="${r==='HIGH'?'risk-high':'risk-medium'}">${r}</span></td></tr>`).join('')}
+  </tbody></table>
+</div>
+<div class="alert alert-blue mt-12" style="font-size:13px">ℹ️ Benchmarks are demo values for simulation purposes. Not official wage notifications.</div>`;
+}
+
+function renderGovtSafety() {
+  return `
+<div class="page-header"><div class="page-title">Safety Reports</div><div class="page-sub"><span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="stat-grid mb-16">
+  ${[['1,760','Total Reports'],['89','This Month'],['42','High Priority'],['234','Resolved']].map(([n,l])=>`<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('')}
+</div>
+<div class="alert alert-red">🔴 Emerging Safety Cluster: Construction sector reports up 34% in Surat this week. <span class="trust-badge trust-ai">AI-detected</span></div>
+<div class="card mt-16"><div class="section-title">Recent High-Priority Reports</div>
+  <table class="data-table"><thead><tr><th>Case ID</th><th>Worker</th><th>Hazard</th><th>Location</th><th>Severity</th><th>Status</th></tr></thead>
+  <tbody>
+    ${[['GJ-SRT-20481','Ramesh Kumar','Missing PPE / Height','Surat','HIGH','Investigation'],
+       ['GJ-SRT-19900','Worker W-042','No Safety Net','Surat','HIGH','Open'],
+       ['GJ-AMD-18234','Worker W-078','Faulty Equipment','Ahmedabad','MEDIUM','Resolved'],
+       ['GJ-VDR-17821','Sita Das','Poor Lighting','Vadodara','MEDIUM','Open']].map(([id,n,h,l,s,st])=>`<tr><td style="font-family:monospace;font-size:12px">${id}</td><td style="font-weight:600">${n}</td><td>${h}</td><td>${l}</td><td><span class="${s==='HIGH'?'risk-high':'risk-medium'}">${s}</span></td><td><span class="badge badge-amber">${st}</span></td></tr>`).join('')}
+  </tbody></table>
+</div>`;
+}
+
+function renderGovtGrievances() {
+  return `
+<div class="page-header"><div class="page-title">Grievance Management</div><div class="page-sub"><span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="stat-grid mb-16">
+  ${[['234','Open'],['312','In Progress'],['1,214','Resolved'],['42','Escalated']].map(([n,l])=>`<div class="stat-card"><div class="stat-num">${n}</div><div class="stat-label">${l}</div></div>`).join('')}
+</div>
+<div class="card"><div class="section-title">Open Grievances</div>
+  <table class="data-table"><thead><tr><th>Case ID</th><th>Worker</th><th>Category</th><th>Priority</th><th>Assigned To</th><th>Days Open</th><th>Actions</th></tr></thead>
+  <tbody>
+    ${[['GJ-SRT-20481','Ramesh Kumar','Safety','HIGH','LO-Surat-07',5],
+       ['GJ-AMD-10234','Meena Devi','Welfare','MED','WO-AMD-03',12],
+       ['GJ-VDR-08823','Sita Das','Welfare','MED','WO-VDR-01',8],
+       ...(demoCaseCreated?[['GJ-SRT-DEMO-001','Ramesh Kumar','Wage+Safety','HIGH','Unassigned',1]]:[])].map(([id,n,c,p,a,d])=>`<tr>
+      <td style="font-family:monospace;font-size:12px;color:var(--primary)">${id}</td>
+      <td style="font-weight:600">${n}</td><td>${c}</td>
+      <td><span class="${p==='HIGH'?'risk-high':'risk-medium'}">${p}</span></td>
+      <td>${a}</td><td>${d}d</td>
+      <td><div class="flex gap-8">
+        <button class="btn btn-primary btn-sm" onclick="reviewCase('${id}')">Review</button>
+        <button class="btn btn-teal btn-sm" onclick="resolveCase('${id}')">Resolve</button>
+      </div></td>
+    </tr>`).join('')}
+  </tbody></table>
+</div>`;
+}
+
+function renderGovtCases() {
+  return `
+<div class="page-header"><div class="page-title">Case Management</div><div class="page-sub">Human review queue · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="alert alert-amber mb-16">👨‍💼 ${demoCaseCreated?'5':'4'} cases awaiting officer action · <span class="trust-badge trust-ai">AI-triaged</span></div>
+<div class="card">
+  <div class="section-title">Cases Awaiting Review</div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    ${[
+      {id:'GJ-SRT-20481',w:'Ramesh Kumar',t:'Safety — Missing PPE, Height Work',p:'HIGH',ai:'Safety Agent detected imminent risk. Field inspection recommended.'},
+      ...(demoCaseCreated?[{id:'GJ-SRT-DEMO-001',w:'Ramesh Kumar',t:'Wage + Safety Composite',p:'HIGH',ai:'Orchestrator flagged: wage concern + safety + overtime. Composite HIGH risk.'}]:[]),
+      {id:'GJ-AMD-10234',w:'Meena Devi',t:'Welfare — PMJAY Application Incomplete',p:'MEDIUM',ai:'Document gap identified. NGO assistance recommended.'},
+      {id:'GJ-VDR-08823',w:'Sita Das',t:'Welfare — PM Awas Application',p:'MEDIUM',ai:'Income and address verification required.'},
+    ].map(c=>`
+    <div class="card" style="border-left:4px solid var(--${c.p==='HIGH'?'red':'amber'})">
+      <div class="flex flex-between flex-center mb-8">
+        <div style="font-family:monospace;font-weight:700;font-size:13px;color:var(--primary)">${c.id}</div>
+        <span class="${c.p==='HIGH'?'risk-high':'risk-medium'}">${c.p}</span>
+      </div>
+      <div style="font-weight:600">${c.w}</div>
+      <div class="text-sm text-muted mt-4">${c.t}</div>
+      <div class="alert alert-blue mt-8" style="font-size:12px">🤖 AI Assessment: ${c.ai} <span class="trust-badge trust-ai">AI-assisted</span></div>
+      <div class="flex gap-8 mt-8">
+        <button class="btn btn-primary btn-sm" onclick="reviewCase('${c.id}')">Review</button>
+        <button class="btn btn-outline btn-sm" onclick="escalateCase('${c.id}')">Escalate</button>
+        <button class="btn btn-teal btn-sm" onclick="resolveCase('${c.id}')">Resolve</button>
+        <button class="btn btn-outline btn-sm" onclick="verifyCase('${c.id}')">Verify</button>
+      </div>
+    </div>`).join('')}
+  </div>
+</div>`;
+}
+
+function reviewCase(id) {
+  alert(`Reviewing case ${id}.\n\nIn a live system, this would open a detailed review panel with worker history, AI analysis, and action tools.`);
+}
+function resolveCase(id) {
+  alert(`Case ${id} marked as resolved.\n\nWorker will be notified. Case moved to Resolved queue.`);
+}
+function escalateCase(id) {
+  alert(`Case ${id} escalated to District Labor Officer.\n\nAn alert has been sent.`);
+}
+function verifyCase(id) {
+  alert(`Verification request sent for case ${id}.\n\nNGO field officer will be dispatched.`);
+}
+
+function renderGovtIntelligence() {
+  return `
+<div class="page-header"><div class="page-title">AI Intelligence Center</div><div class="page-sub">Proactive insights from agentic analysis · <span class="trust-badge trust-ai">AI-assisted</span> · <span class="trust-badge trust-demo">Demo Data</span></div></div>
+<div class="alert alert-blue mb-16">🤖 The AI continuously analyzes patterns across worker data, welfare applications, and safety reports to surface actionable insights for proactive intervention.</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+  ${govtInsights.map(ins=>`
+  <div class="card" style="border-left:4px solid var(--${ins.risk==='High'?'red':'amber'})" id="insight-${ins.id}">
+    <div class="flex flex-between flex-center mb-8">
+      <div>
+        <div style="font-weight:700;font-size:15px">${ins.title}</div>
+        <div class="flex gap-8 mt-4 flex-wrap">
+          <span class="badge ${ins.risk==='High'?'badge-red':'badge-amber'}">Risk: ${ins.risk}</span>
+          <span class="trust-badge trust-ai">AI-assisted</span>
+          <span class="trust-badge trust-demo">Demo Data</span>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:800;color:var(--${ins.risk==='High'?'red':'amber'})">${ins.conf}%</div>
+        <div class="text-xs text-muted">Confidence</div>
+      </div>
+    </div>
+    <div class="text-sm" style="margin-bottom:10px">${ins.desc}</div>
+    <div class="card" style="background:var(--light);padding:10px;margin-bottom:10px">
+      <div class="text-xs text-muted mb-4">📋 Recommended Action</div>
+      <div class="text-sm font-600">${ins.action}</div>
+    </div>
+    <div class="flex flex-between flex-center">
+      <div class="text-xs text-muted">Data period: ${ins.period} · Source: ${ins.source}</div>
+      <div class="flex gap-8">
+        <button class="btn btn-outline btn-sm" onclick="markInsightReviewed('${ins.id}')">✓ Mark Reviewed</button>
+        <button class="btn btn-primary btn-sm" onclick="alert('Action plan created for: '+${JSON.stringify(ins.title)})">Create Action Plan</button>
+      </div>
+    </div>
+    <div id="insight-reviewed-${ins.id}" class="hidden"><div class="alert alert-green mt-8" style="font-size:12px">✅ Marked as reviewed by officer.</div></div>
+  </div>`).join('')}
+</div>`;
+}
+
+function markInsightReviewed(id) {
+  document.getElementById('insight-reviewed-'+id).classList.remove('hidden');
+  const btn = document.querySelector(`#insight-${id} button`);
+  if(btn){ btn.textContent='✅ Reviewed'; btn.disabled=true; }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('workerLayout').style.display = 'flex';
+  document.getElementById('ngoLayout').style.display = 'none';
+  document.getElementById('govtLayout').style.display = 'none';
+  renderPage('landing');
+  setActiveNav('nav-landing');
+});
+</script>
+
+<script>
+  const menuToggle = document.getElementById("menuToggle");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+  function openMenu() {
+    sidebar.classList.add("menu-open");
+    sidebarOverlay.classList.add("active");
+    document.body.classList.add("menu-active");
+
+    menuToggle.innerHTML = "✕";
+    menuToggle.setAttribute("aria-label", "Close menu");
+  }
+
+  function closeMenu() {
+    sidebar.classList.remove("menu-open");
+    sidebarOverlay.classList.remove("active");
+    document.body.classList.remove("menu-active");
+
+    menuToggle.innerHTML = "☰";
+    menuToggle.setAttribute("aria-label", "Open menu");
+  }
+
+  menuToggle.addEventListener("click", function () {
+    if (sidebar.classList.contains("menu-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  // Close when clicking outside sidebar
+  sidebarOverlay.addEventListener("click", closeMenu);
+
+  // Close after clicking a sidebar link
+  document.querySelectorAll(".sidebar-nav a").forEach(function(link) {
+    link.addEventListener("click", function() {
+      if (window.innerWidth <= 768) {
+        closeMenu();
+      }
+    });
+  });
+
+  // Close menu if screen becomes desktop size
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 768) {
+      closeMenu();
+    }
+  });
+</script>
+
+</body>
+</html>
